@@ -2,19 +2,19 @@ let modInfo = {
 	name: "The History Tree",
 	id: "akivn",
 	author: "akivn",
-	pointsName: "knowledge",
+	pointsName: "points",
 	modFiles: ["layers.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
-	offlineLimit: 1,  // In hours
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	offlineLimit: 0,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
-	name: "Literally nothing",
+	num: "0.1",
+	name: "2016 update",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -42,8 +42,16 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(1)
-	
+	let gain = new Decimal(2)
+	if (hasUpgrade('a', 11)) gain = gain.times(2.4)
+	if (hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
+	if (hasUpgrade('a', 13)) gain = gain.times(upgradeEffect('a', 13))
+	if (hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
+	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
+	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
+	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
+	gain = gain.times(tmp.c.effect)
+	return gain
 }
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
@@ -56,7 +64,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e600"))
+	return player.points.gte(new Decimal("1e40"))
 }
 
 
