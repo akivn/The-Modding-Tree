@@ -50,6 +50,9 @@ function getPointGen() {
 	if (hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
 	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
 	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
+	if (hasUpgrade('a', 23)) gain = gain.times(upgradeEffect('a', 23))
+	if (hasUpgrade('c', 13)) gain = gain.times(upgradeEffect('c', 13))
+	if (inChallenge('c', 12)) gain = gain.pow(0.5)
 	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
 	
 	gain = gain.times(tmp.b.effect)
@@ -67,7 +70,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e750"))
+	return player.points.gte(new Decimal("1e696"))
 }
 
 

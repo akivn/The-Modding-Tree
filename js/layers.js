@@ -1,3 +1,6 @@
+
+
+
 addLayer("a", {
     name: "Year 1 (2015)", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "Y1", // This appears on the layer's node. Default is the id with the first letter capitalized
@@ -11,10 +14,12 @@ addLayer("a", {
     resource: "Knowledge", // Name of prestige currency
     baseResource: "points", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
+    branches: ["y1"],
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.66, // Prestige currency exponent
     softcap: new Decimal(1e6), 
-        softcapPower: new Decimal(0.48),
+    softcapPower(){return new Decimal(1).div(player.points.add(10).log(1e34))
+    },
     milestones: {
             0: {requirementDescription: "1e10 Knowledge",
                 done() {return player[this.layer].best.gte(1e10)}, // Used to determine when to give the milestone
@@ -35,6 +40,7 @@ addLayer("a", {
     gainMult() { // Calculate the multiplier for main currency from bonuses
         mult = new Decimal(1)
         if (hasUpgrade('a', 13)) mult = mult.times(upgradeEffect('a',13))
+        if (hasUpgrade('a', 31)) mult = mult.times(upgradeEffect('a',21))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -75,19 +81,22 @@ addLayer("a", {
             description: "Gain more points based on your knowledge points.",
             cost: new Decimal(2),
             effect() {
-                return player[this.layer].points.add(1).pow(0.42)
+                let power_a12 = new Decimal(Math.log(player[this.layer].points.add(1).pow(0.49))).times(100).add(1)
+                return power_a12
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+            
         },
         13: {
             unlocked() { return (hasUpgrade(this.layer, 12))},
             title: "Synergy",
             description: "Gain more knowledge based on your points.",
-            cost: new Decimal(3),
+            cost: new Decimal(100),
             effect() {
-                let upg1 = new Decimal(player.points.add(1).pow(0.21))
-                if (hasAchievement('b', 13)) upg1 = player.points.add(2).pow(0.21)
-                return upg1
+                let power_a13 = new Decimal(Math.log(player.points.add(1).pow(0.21))).add(1)
+                if (hasAchievement('b', 13)) power_a13 = player.points.add(2).pow(0.21)
+                softcap(power_a13, new Decimal(1e30), new Decimal(1).div(Math.log(power_a13)))
+                return power_a13
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
         },
@@ -95,7 +104,7 @@ addLayer("a", {
             unlocked() { return (hasUpgrade(this.layer, 12))},
             title: "Optimisation I",
             description: "Gain more knowledge and points synergized together.",
-            cost: new Decimal(11),
+            cost: new Decimal(1000),
             effect() {
                 return player.points.add(1).pow(0.55)
             },
@@ -107,19 +116,98 @@ addLayer("a", {
             unlocked() { return (hasUpgrade(this.layer, 14))},
             title: "Project Stellosphere",
             description: "Gain more points based on best Stars you have (Which can be obtained in Year 2016).",
-            cost: new Decimal(50),
+            cost: new Decimal(7500),
             effect() {
-                return player.points.pow(player.c.best).times(10).pow(0.035).add(10)
+                let power_a21 = new Decimal (2).pow(player.c.best).pow(0.2)
+                if (hasChallenge('c', 12)) power_a21 = power_a21.times(player.points.add(1)).pow(0.1)
+                if (hasUpgrade('a', 31)) power_a21 = power_a21.times(upgradeEffect('a', 31))
+                softcap(power_a21, new Decimal(1e10), new Decimal(1).div(power_a21.pow(0.3)))
+                return power_a21
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
         },
         22: {
-            unlocked() { return (hasUpgrade(this.layer, 14))},
+            unlocked() { return (hasUpgrade(this.layer, 21))},
             title: "Village Searching",
             description: "Gain more knowledge based on your achievements.",
             cost: new Decimal(1e7),
             effect() {
-                return player[this.layer].points.add(1).pow(player.b.points).pow(0.02)
+                let power_a22 = new Decimal (2).pow(player.b.points).pow(0.2)
+                if (hasChallenge('c', 12)) power_a22 = power_a22.times(player.points.add(1)).pow(0.1)
+                softcap(power_a22, new Decimal(1e10), new Decimal(1).div(power_a22.pow(0.3)))
+                return power_a22
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        23: {
+            unlocked() { return (hasUpgrade(this.layer, 22))},
+            title: "Premiere",
+            description: "Gain more points based on your Y2-challenge completion.",
+            cost: new Decimal(1e15),
+            effect() {
+                let power_a23 = new Decimal (2).pow(Object.values(player.c.challenges).reduce((a,b) => a+b)).pow(6)
+                softcap(power_a23, new Decimal(1e10), new Decimal(1).div(Math.log(power_a23)))
+                return power_a23
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        24: {
+            unlocked() { return (hasUpgrade(this.layer, 23))},
+            title: "Loyalty I",
+            description: "Star boosts are stronger based on your knowledge.",
+            cost: new Decimal(1e27),
+            effect() {
+                let power_a24 = new Decimal (1).times(player.a.points).pow(0.1).add(1)
+                softcap(power_a24, new Decimal(1e10), new Decimal(1).div(Math.log(power_a24)))
+                return power_a24
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        31: {
+            unlocked() { return (hasUpgrade(this.layer, 24))},
+            title: "Stronger spaceship",
+            description: "Upgrade 'Project Stellosphere' is stronger based on your Stars, and can now boost Knowledge gain.",
+            cost: new Decimal(1e34),
+            effect() {
+                let power_a31 = new Decimal (1).times(2).pow(player.c.points)
+                softcap(power_a31, new Decimal(1e4), new Decimal(1).div(Math.log(Math.log(power_a31.add(10)))))
+                return power_a31
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        32: {
+            unlocked() { return (hasUpgrade(this.layer, 24))},
+            title: "Placeholder",
+            description: "Placeholder",
+            cost: new Decimal(1e6969),
+            effect() {
+                let power_a32 = new Decimal (1).times(player.a.points).pow(0.1).add(1)
+                softcap(power_a32, new Decimal(1e10), new Decimal(1).div(Math.log(power_a32)))
+                return power_a32
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        33: {
+            unlocked() { return (hasUpgrade(this.layer, 24))},
+            title: "Placeholder",
+            description: "Placeholder",
+            cost: new Decimal(1e6969),
+            effect() {
+                let power_a33 = new Decimal (1).times(player.a.points).pow(0.1).add(1)
+                softcap(power_a33, new Decimal(1e10), new Decimal(1).div(Math.log(power_a33)))
+                return power_a33
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        34: {
+            unlocked() { return (hasUpgrade(this.layer, 24))},
+            title: "Placeholder",
+            description: "Placeholder",
+            cost: new Decimal(1e6969),
+            effect() {
+                let power_a34 = new Decimal (1).times(player.a.points).pow(0.1).add(1)
+                softcap(power_a34, new Decimal(1e10), new Decimal(1).div(Math.log(power_a34)))
+                return power_a34
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
         },
@@ -192,17 +280,21 @@ addLayer("c", {
     }},
     color: "#0080ff",
     requires: new Decimal(6e6), // Can be a function that takes requirement increases into account
+    branches: ["y2"],
     resource: "Stars", // Name of prestige currency
     baseResource: "points", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 2.44, // Prestige currency exponent
     softcap: new Decimal(8), 
-        softcapPower: new Decimal(0.72),
+        softcapPower: new Decimal(0.22),
     effect(){
         let effect1 = new Decimal (1)
         if (player.c.points >= 1) effect1 = effect1.times(2).pow(player.c.points)
+        if (hasChallenge('c', 11)) effect1 = effect1.times(player.c.points).pow(3)
+        if (hasUpgrade('a', 24)) effect1 = effect1.times(upgradeEffect('a', 24))
         if (inChallenge('c', 11)) effect1 = Math.sqrt(effect1)
+        if (inChallenge('c', 12)) effect1 = Math.sqrt(effect1)
         return effect1
 
   /*
@@ -217,6 +309,10 @@ addLayer("c", {
           use format(num) whenever displaying a number
         */
       },
+    canBuyMax() {
+        return hasChallenge("c", 12)
+        },
+        
     milestones: {
             0: {requirementDescription: "5 Stars",
                 done() {return player[this.layer].best.gte(5)}, // Used to determine when to give the milestone
@@ -250,7 +346,7 @@ addLayer("c", {
             unlocked() {return player[this.layer].best.gte(1)},
             title: "Stargazing",
             description: "Gain more knowledge based on your Stars.",
-            cost: new Decimal(5),
+            cost: new Decimal(7),
             effect() {
                 return player[this.layer].points.add(1).pow(player.c.points).pow(0.5)
             },
@@ -262,7 +358,17 @@ addLayer("c", {
             description: "Gain even more points based on your Stars.",
             cost: new Decimal(10),
             effect() {
-                return player.points.add(1).log(player.c.points.pow(0.1))
+                return player.points.add(1).log(player.c.points.pow(0.1)).add(10)
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        13: {
+            unlocked() { return (hasUpgrade(this.layer, 12))},
+            title: "Primary 4",
+            description: "Further boost point gain based on your effect of 'Stargazing'.",
+            cost: new Decimal(13),
+            effect() {
+                return new Decimal(3).times(upgradeEffect('c', 11).pow(4.8)).add(10)
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
         },
@@ -271,8 +377,16 @@ addLayer("c", {
         11: {
             name: "Degenerate Era",
             challengeDescription: "The effect of stars have been square rooted.",
-            canComplete: function() {return player.points.gte(1e25)},
-            goalDescription: '1e25 points',
+            canComplete: function() {return player.points.gte(1e22)},
+            goalDescription: '1e22 points',
+            rewardDescription: 'Get a boost on Star boost formula.'
+        },
+        12: {
+            name: "Alpha Decay",
+            challengeDescription: "All effects from the previous challenges + Point gain is squared",
+            canComplete: function() {return player.points.gte(1e17)},
+            goalDescription: '1e17 points',
+            rewardDescription: 'The upgrade "Village Searching" uses a better formula and you can now buy max Stars.'
         },
     },
     layerShown(){return true},
