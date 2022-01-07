@@ -43,6 +43,7 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(2)
+	if (hasAchievement('b', 21)) gain = gain.add(1)
 	if (hasUpgrade('a', 11)) gain = gain.times(2.4)
 	if (hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
 	if (hasUpgrade('a', 13)) gain = gain.times(upgradeEffect('a', 13))
@@ -50,6 +51,8 @@ function getPointGen() {
 	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
 	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
 	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
+	
+	gain = gain.times(tmp.b.effect)
 	gain = gain.times(tmp.c.effect)
 	return gain
 }
@@ -64,7 +67,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e40"))
+	return player.points.gte(new Decimal("1e750"))
 }
 
 
