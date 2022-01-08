@@ -36,13 +36,13 @@ addLayer("d", {
         */
       },
     canBuyMax() {
-        return hasChallenge("c", 12)
+        return (hasMilestone("d", 0))
         },
         
     milestones: {
             0: {requirementDescription: "3 Ideas",
                 done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
-                effectDescription: "Year 3 prestiges resets nothing",
+                effectDescription: "Year 3 prestiges resets nothing, and you can buy max ideas",
                 effect() {
                     return player[this.layer].points.add(1).pow(0.22)
                 },
@@ -98,4 +98,7 @@ addLayer("d", {
         if (hasMilestone("d", 0)) keep.push("milestones")
         if (layers[resettingLayer].row > this.row) layerDataReset("d", keep)
            },
+    buyables: {
+        
+    }
 })
