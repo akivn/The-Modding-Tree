@@ -8,21 +8,20 @@ addLayer("d", {
     }},
     color: "#4000ff",
     requires: new Decimal(1e40), // Can be a function that takes requirement increases into account
-    branches: ["y2"],
+    branches: ["c"],
     resource: "Ideas", // Name of prestige currency
     baseResource: "knowledge", // Name of resource prestige is based on
     baseAmount() {return player.a.points}, // Get the current amount of baseResource
-    type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-    exponent: 0.80, // Prestige currency exponent
+    type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 1.77, // Prestige currency exponent
+    softcap: new Decimal(1),
+    softcapPower(){return new Decimal(1).div(player.d.points.add(10).log(1e3))},
 
     effect(){
-        let effect1 = new Decimal (1)
-        if (player.c.points >= 1) effect1 = effect1.times(2).pow(player.c.points)
-        if (hasChallenge('c', 11)) effect1 = effect1.times(player.c.points).pow(3)
-        if (hasUpgrade('a', 24)) effect1 = effect1.times(upgradeEffect('a', 24))
-        if (inChallenge('c', 11)) effect1 = Math.sqrt(effect1)
-        if (inChallenge('c', 12)) effect1 = Math.sqrt(effect1)
-        return effect1
+        let effect2 = new Decimal (1)
+        if (player.d.points >= 1) effect2 = effect2.times(2).pow(player.d.points.log(3).add(0.1))
+        if (inChallenge('c', 21)) effect2 = new Decimal(1)
+        return effect2
 
   /*
     you should use this.layer instead of <layerID>
@@ -31,7 +30,7 @@ addLayer("d", {
   */
     },
     effectDescription(){
-        return "multiplying point gain by " + format(tmp[this.layer].effect)
+        return "multiplying star effect by " + format(tmp[this.layer].effect) + " and raises the Knowledge gain to the power of " + format(tmp[this.layer].effect.log(10).add(1))
         /*
           use format(num) whenever displaying a number
         */
@@ -41,9 +40,9 @@ addLayer("d", {
         },
         
     milestones: {
-            0: {requirementDescription: "5 Stars",
-                done() {return player[this.layer].best.gte(5)}, // Used to determine when to give the milestone
-                effectDescription: "Year 2 prestiges resets nothing, and gain 1% of the points you get every second.",
+            0: {requirementDescription: "3 Ideas",
+                done() {return player[this.layer].best.gte(3)}, // Used to determine when to give the milestone
+                effectDescription: "Year 3 prestiges resets nothing",
                 effect() {
                     return player[this.layer].points.add(1).pow(0.22)
                 },
@@ -51,10 +50,9 @@ addLayer("d", {
                     return player.points.add(1).pow(0.21)
                 },
             },
-            1: {requirementDescription: "14 Stars",
-                unlocked() {return hasMilestone(this.layer, 0)},
+            1: {requirementDescription: "14 Ideas",
                 done() {return player[this.layer].best.gte(14)},
-                effectDescription: "Get a boost on the layer boost formula",
+                effectDescription: "Unlock 1 new Year 2 challenge",
                 },
     },
     gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -68,11 +66,36 @@ addLayer("d", {
     hotkeys: [
         {key: "3", description: "3: Reset for Ideas", onPress(p){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    effect() {
-        let effect2 = new Decimal (1)
-        if (player.d.points >= 1) effect2 = new Decimal (1.1).pow(player.d.points).add(3)
-    },
     upgrades: {
+        11: {
+            unlocked() {return player[this.layer].best.gte(1)},
+            title: "Brain Wrinkle",
+            description: "Gain more points based on your Ideas.",
+            cost: new Decimal(3),
+            effect() {
+                return new Decimal(2).times(player.d.points).pow(player.d.points).add(2)
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
+        12: {
+            unlocked() {return player[this.layer].best.gte(1)},
+            title: "Ice Highway",
+            description: "Upgrade 'Premiere' is much stronger.",
+            cost: new Decimal(13),
+            effect() {
+                return new Decimal(2).times(player.points.add(10).log(10)).pow(player.d.points).add(2)
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }
+        },
     },
-    layerShown(){return (player.a.points.gte(1e36))},
+    layerShown(){return player.a.best.gte(1e36) || player.d.best.gte(1)},
+    resetsNothing() {
+        return hasMilestone("d", 0)
+        },
+    doReset(resettingLayer) {
+        let keep = []
+        if (hasMilestone("d", 0)) keep.push("upgrades")
+        if (hasMilestone("d", 0)) keep.push("milestones")
+        if (layers[resettingLayer].row > this.row) layerDataReset("d", keep)
+           },
 })
