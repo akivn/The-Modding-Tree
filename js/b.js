@@ -70,7 +70,7 @@ addLayer("b", {
         23: {
             name: "Challenge!",
             done() {return Object.values(player.c.challenges).reduce((a,b) => a+b) >= 1},  // This one is a freebie
-            goalTooltip: "Get upgrade 'Stargazing'.", // Shows when achievement is not completed
+            goalTooltip: "Finish your first challenge.", // Shows when achievement is not completed
             onComplete() {
                 player.b.points = player.b.points.add(1)
             },
