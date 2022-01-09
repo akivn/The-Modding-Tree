@@ -3,11 +3,11 @@ let modInfo = {
 	id: "akivn",
 	author: "akivn",
 	pointsName: "points",
-	modFiles: ["layers.js", "tree.js", "d.js"],
+	modFiles: ["layers/a.js", "layers/b.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	offlineLimit: 0,  // In hours
 }
 
@@ -42,21 +42,21 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(2)
-	if (hasAchievement('b', 21)) gain = gain.add(1)
-	if (hasUpgrade('a', 11)) gain = gain.times(2.4)
-	if (hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
-	if (hasUpgrade('a', 13)) gain = gain.times(upgradeEffect('a', 13))
-	if (hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
-	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
-	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
-	if (hasUpgrade('a', 23)) gain = gain.times(upgradeEffect('a', 23))
-	if (hasUpgrade('c', 13)) gain = gain.times(upgradeEffect('c', 13))
-	if (inChallenge('c', 12)) gain = gain.pow(0.5)
-	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
-	
-	gain = gain.times(tmp.b.effect)
-	gain = gain.times(tmp.c.effect)
+	let gain = new Decimal(0)
+	if(hasUpgrade('a', 11)) gain = new Decimal(1)
+	if(hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
+	if(hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
+	if(hasUpgrade('a', 25)) gain = gain.times(upgradeEffect('a', 25))
+	if(getBuyableAmount('a',11) >= (1)) gain = gain.times(buyableEffect('a', 11))
+	if(getBuyableAmount('a',12) >= (1)) gain = gain.times(buyableEffect('a', 12))
+	if(getBuyableAmount('a',21) >= (1)) gain = gain.times(buyableEffect('a', 21))
+	if(getBuyableAmount('a',22) >= (1)) gain = gain.times(buyableEffect('a', 22))
+	if(getBuyableAmount('a',31) >= (1)) gain = gain.times(buyableEffect('a', 31))
+	gain = gain.times(new Decimal(tmp.b.effect))
+    softcap(gain, new Decimal(1e63), new Decimal(1).div(player.points.div(1e63).add(10).log(1e19).pow(0.3)))
+	softcap(gain, new Decimal(1e96), new Decimal(1).div(player.points.add(10).pow(3)))
+	if(inChallenge('a', 12)) gain = gain.pow(0.5)
+	if(inChallenge('a', 13)) gain = gain.pow(0.5)
 	return gain
 }
 
@@ -70,7 +70,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e83"))
+	return player.points.gte(new Decimal("1.79e308"))
 }
 
 
