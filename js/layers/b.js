@@ -134,6 +134,13 @@ addLayer("b", {
             return player.b.points.gte(9)
             }, 
         },
+        4: {
+            requirementDescription: "17 stars",
+            effectDescription: "Automate buying buyables (Year 1).",
+            done() { 
+            return player.b.points.gte(17)
+            }, 
+        },
     },
     challenges: {
         11: {

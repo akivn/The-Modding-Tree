@@ -23,15 +23,7 @@ addLayer("a", {
             description: "1: reset your points for brain cells", // The description of the hotkey that is displayed in the game's How To Play tab
             onPress() { if (player.a.unlocked) doReset("a") }, // Determines if you can use the hotkey, optional
         }
-    ],   
-    automate() {
-        buyBuyable('a', 11) ? 10:0
-        buyBuyable('a', 12) ? 10:0
-        buyBuyable('a', 21) ? 10:0
-        buyBuyable('a', 22) ? 10:0
-        buyBuyable('a', 31) ? 10:0
-        //Add more if needed and replace layer and id
-        },                     // "normal" prestige gain is (currency^exponent).
+    ],               // "normal" prestige gain is (currency^exponent).
 
     gainMult() {
         let mult = new Decimal(1)
@@ -293,7 +285,7 @@ addLayer("a", {
             title: "Mind-Generator",
             cost(x) { 
                 let cost_ab11 = new Decimal(2).pow(x.div(4).add(1))
-                if (getBuyableAmount('a', 11) >= new Decimal(1000)) cost_ab11 = new Decimal(2).pow(x.pow(1.012).add(1))
+                if (getBuyableAmount('a', 11).gte(new Decimal(1000))) cost_ab11 = new Decimal(2).pow(x.pow(1.012).add(1))
                 return cost_ab11 
             },
             effect(x){
@@ -312,12 +304,15 @@ addLayer("a", {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
+            autoBuy() {
+                return (hasMilestone('a', 4))
+            },
         },
         12: {
             title: "Mind-Generator II",
             cost(x) { 
                 let cost_ab12 = new Decimal(2).pow(x.div(3).add(7.96578428466))
-                if (getBuyableAmount('a', 12) >= new Decimal(750)) cost_ab12 = new Decimal(2).pow(x.pow(1.024).add(7.96578428466))
+                if (getBuyableAmount('a', 12).gte(750)) cost_ab12 = new Decimal(2).pow(x.pow(1.024).add(7.96578428466))
                 return cost_ab12
             },
             effect(x){
@@ -336,12 +331,15 @@ addLayer("a", {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
+            autoBuy() {
+                return (hasMilestone('a', 4))
+            },
         },
         21: {
             title: "Mind-Generator III",
             cost(x) { 
                 let cost_ab21 = new Decimal(2).pow(x.div(2).add(56.4727776131))
-                if (getBuyableAmount('a', 21) >= new Decimal(420)) cost_ab21 = new Decimal(2).pow(x.pow(1.048).add(56.4727776131))
+                if (getBuyableAmount('a', 21).gte(420)) cost_ab21 = new Decimal(2).pow(x.pow(1.048).add(56.4727776131))
                 return cost_ab21
             },
             effect(x){
@@ -363,12 +361,15 @@ addLayer("a", {
             unlocked() {
                 return hasUpgrade('b', 11)
             },
+            autoBuy() {
+                return (hasMilestone('a', 4))
+            },
         },
         22: {
             title: "Mind-Generator IV",
             cost(x) { 
                 let cost_ab22 = new Decimal(2).pow(x.div(1.6).add(89.692058562))
-                if (getBuyableAmount('a', 22) >= new Decimal(300)) cost_ab22 = new Decimal(2).pow(x.pow(1.096).add(89.692058562))
+                if (getBuyableAmount('a', 22).gte(300)) cost_ab22 = new Decimal(2).pow(x.pow(1.096).add(89.692058562))
                 return cost_ab22
             },
             effect(x){
@@ -390,12 +391,15 @@ addLayer("a", {
             unlocked() {
                 return hasChallenge('b', 11)
             },
+            autoBuy() {
+                return (hasMilestone('a', 4))
+            },
         },
         31: {
             title: "Mind-Generator V",
             cost(x) { 
                 let cost_ab31 = new Decimal(2).pow(x.add(188.763495491))
-                if (getBuyableAmount('a', 31) >= new Decimal(100)) cost_ab31 = new Decimal(2).pow(x.pow(1.192).add(188.763495491))
+                if (getBuyableAmount('a', 31).gte(100)) cost_ab31 = new Decimal(2).pow(x.pow(1.192).add(188.763495491))
                 return cost_ab31
             },
             effect(x){
@@ -416,6 +420,9 @@ addLayer("a", {
             },
             unlocked() {
                 return hasChallenge('b', 13)
+            },
+            autoBuy() {
+                return (hasMilestone('a', 4))
             },
         },
     },
