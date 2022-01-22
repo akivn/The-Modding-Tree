@@ -3,18 +3,18 @@ let modInfo = {
 	id: "akivn",
 	author: "akivn",
 	pointsName: "points",
-	modFiles: ["layers.js", "tree.js", "d.js"],
+	modFiles: ["layers/year1.js", "layers/year2.js","layers/year3.js", "layers/Flowers.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	offlineLimit: 0,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
-	name: "2016 update",
+	num: "0.30",
+	name: "Rewritten-Beta-3",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -42,21 +42,15 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(2)
-	if (hasAchievement('b', 21)) gain = gain.add(1)
-	if (hasUpgrade('a', 11)) gain = gain.times(2.4)
-	if (hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
-	if (hasUpgrade('a', 13)) gain = gain.times(upgradeEffect('a', 13))
-	if (hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
-	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
-	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
-	if (hasUpgrade('a', 23)) gain = gain.times(upgradeEffect('a', 23))
-	if (hasUpgrade('c', 13)) gain = gain.times(upgradeEffect('c', 13))
-	if (inChallenge('c', 12)) gain = gain.pow(0.5)
-	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
-	
+	let gain = new Decimal(0)
+	if(hasUpgrade('a', 11)) gain = new Decimal(1)
+	if(hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
+	if(hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
+	if(getBuyableAmount('a', 11).gte(1)) gain = gain.times(buyableEffect('a', 11))
+	if(getBuyableAmount('a', 12).gte(1)) gain = gain.times(buyableEffect('a', 12))
+	if(getBuyableAmount('a', 21).gte(1)) gain = gain.times(buyableEffect('a', 21))
 	gain = gain.times(tmp.b.effect)
-	gain = gain.times(tmp.c.effect)
+	if (player.c.points.gte(1)) gain = gain.times(tmp.c.effect.pow(2).times(10))
 	return gain
 }
 
@@ -70,7 +64,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e83"))
+	return player.points.gte(new Decimal("1e185"))
 }
 
 
