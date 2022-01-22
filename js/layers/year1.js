@@ -189,7 +189,8 @@ addLayer("a", {
     doReset(resettingLayer) {
         let keep = []
         if (hasMilestone("b", 0)) keep.push("upgrades")
-        if (hasMilestone("b", 0)||hasMilestone('c', 2)) keep.push("buyables")
+        if (hasMilestone("b", 0)) keep.push("buyables")
+        if (hasMilestone("c", 2)) keep.push("buyables")
         if (layers[resettingLayer].row > this.row) layerDataReset("a", keep)
        },
     passiveGeneration() {

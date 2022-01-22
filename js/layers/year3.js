@@ -87,7 +87,7 @@ addLayer("c", {
         2: {
             requirementDescription: "10,000,000 Power",
             done() {return player[this.layer].best.gte(1e7)}, // Used to determine when to give the milestone
-            effectDescription: "Keep Mind-Generators on Year 3 resets, and unlock 4 new upgrades.",
+            effectDescription: "Keep Mind-Generators and Flowers on Year 3 resets, and unlock 4 new upgrades.",
         },
 
     },

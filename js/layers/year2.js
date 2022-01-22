@@ -37,7 +37,9 @@ addLayer("b", {
     doReset(resettingLayer) {
         let keep = []
         if (hasMilestone("c", 1)) keep.push("milestones")
-        if (layers[resettingLayer].row > this.row) layerDataReset("a", keep)
+        if (hasMilestone("c", 1)) keep.push("upgrades")
+        if (hasMilestone("c", 1)) keep.push("challenges")
+        if (layers[resettingLayer].row > this.row) layerDataReset("b", keep)
        },
 
     layerShown() { return player.points.gte(1e9) || player.b.best.gte(1) || player.c.best.gte(1) },
@@ -50,7 +52,7 @@ addLayer("b", {
         return softcap(effect_b, new Decimal(1e10), new Decimal(1).div(new Decimal(effect_b).pow(0.015)))
     },
     effectDescription(){
-            return "boosting points and knowledge gain by x" + format(tmp[this.layer].effect)        
+            return "boosting points and brain cells gain by x" + format(tmp[this.layer].effect)        
     },
 
     upgrades: {

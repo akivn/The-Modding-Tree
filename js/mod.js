@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.30",
-	name: "Rewritten-Beta-3",
+	num: "0.31-cEP1",
+	name: "Rewritten-Beta-4 and Emergency Patch",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -23,7 +23,11 @@ let changelog = `<h1>Changelog:</h1><br>
 		2. Added 2 new upgrades in Y2.<br>
 		3. Added 1 challenge in Y2.<br>
 		4. Added Flowers!<br>
-		5. Year 3 IS HERE!<br>`
+		5. Year 3 IS HERE!<br>
+	<h3>v0.31-cEP1</h3> - Flora update<br>
+		1. Fixed the 1 star softlock by increasing the base of Star effect to 3.<br>
+		2. Added 1 new upgrade to Year 3.`
+		
 
 let winText = `Congratulations! You have reached the present and beaten this game, but for now...`
 
@@ -67,7 +71,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e185"))
+	return player.points.gte(new Decimal("1e256"))
 }
 
 

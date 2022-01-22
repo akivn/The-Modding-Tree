@@ -185,6 +185,11 @@ addLayer("fl", {
             ]
         },
     },
+    doReset(resettingLayer) {
+        let keep = []
+        if (hasMilestone("c", 2)) keep.push("buyables")
+        if (layers[resettingLayer].row > this.row) layerDataReset("f", keep)
+       },
 
 
 })
