@@ -46,13 +46,57 @@ addLayer("c", {
     let keep = []
     layerDataReset(this.layer, keep)
     },
+    softcap: new Decimal(1e10),
+    softcapPower: 0.25,
+
     effect() {
         let effect_c = new Decimal(1)
-        effect_c = effect_c.times(new Decimal(1.5).pow(player.c.points))
-        return softcap(effect_c, new Decimal(1e10), new Decimal(1).div(new Decimal(effect_c).pow(0.1)))
+        effect_c = effect_c.times(new Decimal(player.c.points).pow(1.5).add(2))
+        effect_c = softcap(effect_c, new Decimal(1e6), new Decimal(1).div(new Decimal(effect_c).log(1e6).log(2).add(1)))
+        if (hasUpgrade('c', 11)) effect_c = effect_c.times(12.5)
+        return effect_c
     },
     effectDescription(){
             return "boosting Flora gain by x" + format(tmp[this.layer].effect) + " and boosting points gain by x" + format(tmp[this.layer].effect.pow(2).times(10))       
+    },
+    tabFormat: {
+        "Main": {
+            content: [
+                "main-display",
+                "prestige-button",
+                "upgrades",
+            ],
+        },
+        "Milestones": {
+            content: [
+                "milestones"
+            ],
+        }
+    },
+    milestones: {
+        0: {
+            requirementDescription: "1 Power",
+                done() {return player[this.layer].best.gte(1)}, // Used to determine when to give the milestone
+                effectDescription: "You can now buy max Stars.",
+        },
+        1: {
+            requirementDescription: "5 Power",
+            done() {return player[this.layer].best.gte(5)}, // Used to determine when to give the milestone
+            effectDescription: "Keep Everything of Year 2 on Year 3 resets.",
+        },
+        2: {
+            requirementDescription: "10,000,000 Power",
+            done() {return player[this.layer].best.gte(1e7)}, // Used to determine when to give the milestone
+            effectDescription: "Keep Mind-Generators on Year 3 resets, and unlock 4 new upgrades.",
+        },
+
+    },
+    upgrades: {
+        11: {
+            title: "Lower Village Station",
+            description: "Give a 12.5x boost to Power effect, which omits the softcap.",
+            cost: new Decimal(3e7),
+        },
     },
 
     })

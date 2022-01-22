@@ -34,11 +34,16 @@ addLayer("b", {
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
+    doReset(resettingLayer) {
+        let keep = []
+        if (hasMilestone("c", 1)) keep.push("milestones")
+        if (layers[resettingLayer].row > this.row) layerDataReset("a", keep)
+       },
 
     layerShown() { return player.points.gte(1e9) || player.b.best.gte(1) || player.c.best.gte(1) },
     effect() {
         let effect_b = new Decimal(1)
-        if (player.b.points.gte(1)) effect_b = new Decimal(2).pow(player.b.points)
+        if (player.b.points.gte(1)) effect_b = new Decimal(3).pow(player.b.points)
         if (hasUpgrade('a', 24)) effect_b = effect_b.times(upgradeEffect('a', 24))
         if (hasUpgrade('a', 31)) effect_b = effect_b.times(upgradeEffect('a', 31))
         if (hasUpgrade('b', 12)) effect_b = effect_b.times(6)
@@ -74,6 +79,9 @@ addLayer("b", {
             }
         },
 
+    },
+    canBuyMax() {
+        return hasMilestone('c', 0)
     },
     tabFormat: {
         "Main": {
