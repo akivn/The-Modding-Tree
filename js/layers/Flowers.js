@@ -67,7 +67,7 @@ addLayer("fl", {
                 return softcap(cost, new Decimal(1e16), new Decimal(1).times(cost.log(1e16)))
             },
             effect(x){
-                let power = new Decimal(1).mul(x.add(1).pow(1.4).add(1)).add(1)
+                let power = new Decimal(1).mul(x.pow(1.4))
                 power = power.times(buyableEffect('fl', 12))
                 if(hasUpgrade('c', 15)) power = power.times(upgradeEffect('c', 15))
                 return power
