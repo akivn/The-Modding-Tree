@@ -12,12 +12,15 @@ addLayer("b", {
     baseResource: "points",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.points },  // A function to return the current amount of baseResource.
 
-    requires: new Decimal(1e10),              // The amount of the base needed to  gain 1 of the prestige currency.
+    requires: new Decimal(1e10),
+    position: 1,              // The amount of the base needed to  gain 1 of the prestige currency.
                                             // Also the amount required to unlock the layer.
 
     type: "static",                         // Determines the formula used for calculating prestige currency.
     exponent: 1,
     base: 1e15,
+    softcap: 56,
+    softcapPower: 0.2,
     branches: ['c', 'fl'],  
     hotkeys: [
         {
@@ -49,10 +52,18 @@ addLayer("b", {
         if (hasUpgrade('a', 24)) effect_b = effect_b.times(upgradeEffect('a', 24))
         if (hasUpgrade('a', 31)) effect_b = effect_b.times(upgradeEffect('a', 31))
         if (hasUpgrade('b', 12)) effect_b = effect_b.times(6)
-        return softcap(effect_b, new Decimal(1e10), new Decimal(1).div(new Decimal(effect_b).pow(0.015)))
+        effect_b = softcap(effect_b, new Decimal(1e10), new Decimal(1).div(new Decimal(effect_b).pow(0.015)))
+        if (hasUpgrade('c', 14)) effect_b = effect_b.times(upgradeEffect('c', 14))
+        if (hasUpgrade('c', 23)) effect_b = effect_b.pow(4)
+        if (inChallenge('b', 21)) effect_b = new Decimal(1)
+        if (inChallenge('b', 42)) effect_b = new Decimal(1)
+        return effect_b
     },
     effectDescription(){
             return "boosting points and brain cells gain by x" + format(tmp[this.layer].effect)        
+    },
+    autoPrestige() {
+        return hasMilestone('c', 2)
     },
 
     upgrades: {
@@ -112,6 +123,90 @@ addLayer("b", {
             canComplete: function() {
             return player.points.gte(1e72)
             },
+        },
+        12: {
+            name: "Slippery Floor",
+            challengeDescription: "All previous challenges + Dynamic Year 1 Upgrades are disabled.",
+            goalDescription: "1e270 points",
+            rewardDescription: "Boost Y3 Upgrade 12 to ^2.5. (Omits the softcap)",
+            canComplete: function() {
+            return player.points.gte(1e270)
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        21: {
+            name: "Parallel Universe",
+            challengeDescription: "All previous challenges + Star effect is disabled.",
+            goalDescription: "1e374 points",
+            rewardDescription: "Unlock Layer Super-Generator. (In Layer 2.)",
+            canComplete: function() {
+            return player.points.gte('1e374')
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        22: {
+            name: "Instant Karma",
+            challengeDescription: "Point Gain is square-rooted.",
+            goalDescription: "1e215 points",
+            rewardDescription: "Unlock Mind-Generator V.",
+            canComplete: function() {
+            return player.points.gte(1e215)
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        31: {
+            name: "Village Anti-Searching",
+            challengeDescription: "Challenge 4 + SGs are disabled.",
+            goalDescription: "6.9e269 points",
+            rewardDescription: "Unlock Flora Buyable 5.",
+            canComplete: function() {
+            return player.points.gte(6.9e269)
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        32: {
+            name: "Robots?",
+            challengeDescription: "Challenge 5 + Brain cells gain is powered to ^0.1.",
+            goalDescription: "3.55e355 points",
+            rewardDescription: "Unlock Robots (In Year 3).",
+            canComplete: function() {
+            return player.points.gte("3.55e355")
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        41: {
+            name: "Mission Force Two",
+            challengeDescription: "Year 3 effect does nothing.",
+            goalDescription: "1.058e1058 points",
+            rewardDescription: "Massively Boost upgrade 'Laserang' by x1e100.",
+            canComplete: function() {
+            return player.points.gte("1.058e1058")
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
+        },
+        42: {
+            name: "Nemesystems",
+            challengeDescription: "Every previous challenges combined.",
+            goalDescription: "2e710 points",
+            rewardDescription: "UNLOCK YEAR 4.",
+            canComplete: function() {
+            return player.points.gte("2e710")
+            },
+            unlocked() {
+                return hasUpgrade('c', 13)
+            }
         },
 
     },

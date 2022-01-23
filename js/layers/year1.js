@@ -16,7 +16,7 @@ addLayer("a", {
 
     requires: new Decimal(10),              // The amount of the base needed to  gain 1 of the prestige currency.
                                             // Also the amount required to unlock the layer.
-    branches: 'b',
+    branches: ['b', 's'],
     type: "normal",                         // Determines the formula used for calculating prestige currency.
     exponent: 0.5,  
     hotkeys: [
@@ -26,13 +26,18 @@ addLayer("a", {
             onPress() { if (player.a.unlocked) doReset("a") }, // Determines if you can use the hotkey, optional
         }
     ],               // "normal" prestige gain is (currency^exponent).
-
+    softcap: 1e500,
+    softcapPower: 0.3,
     gainMult() {
         let mult = new Decimal(1)
         if (hasUpgrade('a', 13)) mult = mult.times(upgradeEffect('a', 13))
         if (hasUpgrade('a', 21)) mult = mult.times(upgradeEffect('a', 21))
         mult = mult.times(tmp.b.effect)
         if (getBuyableAmount('fl', 11) > 1) mult = mult.times(buyableEffect('fl', 11))
+        if (inChallenge('b', 32)) mult = mult.pow(new Decimal(0.1))
+        if(hasMilestone('fa', 1)) mult = mult.times(tmp.fa.effect.pow(4))
+        if (hasUpgrade('c', 25)) mult = mult.times(tmp.s.effect)
+        if (inChallenge('b', 42)) mult = mult.pow(0.1)
 
         return mult              // Factor in any bonuses multiplying gain here.
     },
@@ -58,7 +63,12 @@ addLayer("a", {
             effect() {
                 let power_12 = new Decimal(player.points).div(6).add(1)
                 if (hasUpgrade('a', 14)) power_12 = power_12.pow(2)
-                return softcap(power_12, new Decimal(100), new Decimal(0.2).times(new Decimal(1).div(power_12.log(1e6).add(1))))
+                power_12 = softcap(power_12, new Decimal(100), new Decimal(0.2).times(new Decimal(1).div(power_12.log(1e6).add(1))))
+                if (hasUpgrade('a', 25)) power_12 = power_12.pow(10)
+                if (inChallenge('b', 12)) power_12 = new Decimal(1)
+                if (inChallenge('b', 21)) power_12 = new Decimal(1)
+                if (inChallenge('b', 42)) power_12 = new Decimal(1)
+                return power_12
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked(){
@@ -71,6 +81,10 @@ addLayer("a", {
             cost: new Decimal(16),
             effect() {
                 let power_13 = new Decimal(player.a.points).div(6).add(1)
+                if (inChallenge('b', 12)) power_13 = new Decimal(1)
+                if (inChallenge('b', 21)) power_13 = new Decimal(1)
+                if (inChallenge('b', 42)) power_13 = new Decimal(1)
+
                 return softcap(power_13, new Decimal(15), new Decimal(1).div(power_13.log(1e6).add(1)))
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -93,7 +107,13 @@ addLayer("a", {
             effect() {
                 let power_21 = new Decimal(player.points.add(2)).log(2)
                 if (hasUpgrade('b', 12)) power_21 = power_21.pow(1.6)
-                return softcap(power_21, new Decimal(2e6), new Decimal(1).div(power_21.log(1e6).add(1)))
+                if (inChallenge('b', 12)) power_21 = new Decimal(1)
+                if (inChallenge('b', 21)) power_21 = new Decimal(1)
+                if (inChallenge('b', 42)) power_21 = new Decimal(1)
+
+                power_21 = softcap(power_21, new Decimal(2e6), new Decimal(1).div(power_21.log(1e6).add(1)))
+                if (hasChallenge('b', 41)) power_21 = power_21.times(1e100)
+                return power_21
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked(){
@@ -106,6 +126,10 @@ addLayer("a", {
             cost: new Decimal(524288),
             effect() {
                 let power_22 = new Decimal(player.a.points.pow(0.15))
+                if (inChallenge('b', 12)) power_22 = new Decimal(1)
+                if (inChallenge('b', 21)) power_22 = new Decimal(1)
+                if (inChallenge('b', 42)) power_22 = new Decimal(1)
+
                 return softcap(power_22, new Decimal(2e6), new Decimal(1).div(power_22.log(1e6).add(1)))
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -127,6 +151,10 @@ addLayer("a", {
             cost: new Decimal(5e10),
             effect() {
                 let power_24 = new Decimal(10).pow(getBuyableAmount('a', 11).div(3)).pow(player.points.add(2).log(1e9))
+                if (inChallenge('b', 12)) power_24 = new Decimal(1)
+                if (inChallenge('b', 21)) power_24 = new Decimal(1)
+                if (inChallenge('b', 42)) power_24= new Decimal(1)
+
                 return softcap(power_24, new Decimal(2e6), new Decimal(1).div(power_24.log(1e6).add(1)))
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -141,6 +169,10 @@ addLayer("a", {
             effect() {
                 let power_31 = buyableEffect('a', 11).times(buyableEffect('a', 12).pow(0.1))
                 if (hasUpgrade('a', 32) && getBuyableAmount('a', 21) > 1) power_31 = buyableEffect('a', 11).times(buyableEffect('a', 12).times(buyableEffect('a', 21).pow(0.1)))
+                if (inChallenge('b', 12)) power_31 = new Decimal(1)
+                if (inChallenge('b', 21)) power_31 = new Decimal(1)
+                if (inChallenge('b', 42)) power_31 = new Decimal(1)
+
                 return softcap(power_31, new Decimal(1e12), new Decimal(1).div(power_31.log(1e12).add(1)))
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -167,9 +199,13 @@ addLayer("a", {
         34: {
             title: "Flora-Alpha",
             description: "Boost flora gain based on your log(points) (softcaps at 100x)",
-            cost: new Decimal(1e93),
+            cost: new Decimal(1e123),
             effect() {
                 let power_34 = new Decimal(1).times(player.points.add(10).log(10))
+                if (inChallenge('b', 12)) power_34 = new Decimal(1)
+                if (inChallenge('b', 21)) power_34 = new Decimal(1)
+                if (inChallenge('b', 42)) power_34 = new Decimal(1)
+
                 return softcap(power_34, new Decimal(100), new Decimal(1).div(power_34.log(100).add(1)))
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -180,9 +216,83 @@ addLayer("a", {
         41: {
             title: "HAPPY NEW YEAR!!!",
             description: "UNLOCK YEAR 3.",
-            cost: new Decimal(1e131),
+            cost: new Decimal(1e139),
             unlocked(){
                 return (hasUpgrade('b', 11))
+            },
+        },
+        15: {
+            title: "Flora-Beta",
+            description: "Boost flora gain based on your log3(Power) (softcaps at 100x)",
+            cost: new Decimal(1e275),
+            effect() {
+                let power = new Decimal(1).times(player.c.points.add(10).log(3))
+                if (inChallenge('b', 12)) power = new Decimal(1)
+                if (inChallenge('b', 21)) power = new Decimal(1)
+                if (inChallenge('b', 42)) power = new Decimal(1)
+
+                return softcap(power, new Decimal(100), new Decimal(1).div(power.log(100).add(1)))
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        25: {
+            title: "Upgrade Boost II",
+            description: "Boost Upgrade 'Self-sufficient' by ^10 again (not affected by softcap)",
+            cost: new Decimal('3.44e344'),
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        35: {
+            title: "Upgrade Boost III",
+            description: "Boost Upgrade 'Rainbow Bridge' effect by ^2.",
+            cost: new Decimal('1e398'),
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        42: {
+            title: "Flora, Fauna",
+            description: "Unlock Fauna.",
+            cost: new Decimal('1e475'),
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        43: {
+            title: "The invasion of Robots",
+            description: "Boost the effect of Robot 1 (only) by ^1.5.",
+            cost: new Decimal('1e517'),
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        44: {
+            title: "Devil number",
+            description: "Unlock Robot 2, and boost Flora effect by ^6.66, and x666 for the production of Sheeps.",
+            cost: new Decimal('1e667').div(1.5),
+            unlocked(){
+                return (hasUpgrade('c', 15))
+            },
+        },
+        45: {
+            title: "INFINITY!",
+            description: "Power gain is further boosted by itself.",
+            cost: new Decimal('1e1024'),
+            effect() {
+                let power = new Decimal(1).times(player.c.points.pow(0.5))
+                if (inChallenge('b', 12)) power = new Decimal(1)
+                if (inChallenge('b', 21)) power = new Decimal(1)
+                if (inChallenge('b', 42)) power = new Decimal(1)
+
+                return softcap(power, new Decimal(1e36), new Decimal(1).div(power.log(1e36)))
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){
+                return (hasUpgrade('c', 15))
             },
         },
     },
@@ -208,6 +318,7 @@ addLayer("a", {
             effect(x){
                 let power_ab11 = new Decimal(1).mul(new Decimal(3.2).pow(x).add(1).pow(2))
                 power_ab11 = power_ab11.times(tmp.fl.effect)
+                power_ab11 = power_ab11.times(tmp.s.effect)
                 return softcap(power_ab11, new Decimal(1e5), new Decimal(1).div(power_ab11.add(1).log(100)).add(1)) 
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -230,7 +341,10 @@ addLayer("a", {
             effect(x){
                 let power_ab12 = new Decimal(1).mul(x.pow(4).add(1).pow(1.4))
                 power_ab12 = power_ab12.times(tmp.fl.effect)
-                return softcap(power_ab12, new Decimal(1e4), new Decimal(1.2).add(power_ab12.pow(0.02).pow(x.pow(0.16))))
+                power_ab12 = power_ab12.times(tmp.s.effect)
+                power_ab12 = softcap(power_ab12, new Decimal(1e4), new Decimal(1.2).add(power_ab12.pow(0.02).pow(x.pow(0.16))))
+                power_ab12 = softcap(power_ab12, new Decimal('1e380'), new Decimal(1).div(power_ab12.add(2).log(1e60)))
+                return power_ab12
             },
             display() { let data = tmp[this.layer].buyables[this.id]
                 return "Cost: " + format(data.cost) + " brain cells\n\
@@ -253,6 +367,7 @@ addLayer("a", {
             effect(x){
                 let power_ab21 = new Decimal(1).mul(new Decimal(16).pow(x))
                 power_ab21 = power_ab21.times(tmp.fl.effect)
+                power_ab21 = power_ab21.times(tmp.s.effect)
                 return softcap(power_ab21, new Decimal(1e16), new Decimal(1).div(power_ab21.add(2).log(1e60)))
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -276,6 +391,7 @@ addLayer("a", {
             effect(x){
                 let power_ab22 = new Decimal(1).mul(new Decimal(2).pow(x))
                 power_ab22 = power_ab22.times(tmp.fl.effect)
+                power_ab22 = power_ab22.times(tmp.s.effect)
                 return softcap(power_ab22, new Decimal(1e16), new Decimal(1).div(power_ab22.add(2).log(1e60)))
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -289,6 +405,30 @@ addLayer("a", {
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             unlocked() { return hasChallenge('b', 11)},
+        },
+        31: {
+            title: "Mind-Generator V",
+            cost(x) { 
+                let cost = new Decimal(1e260).times(new Decimal(10).pow(x.mul(10).add(1)))
+                return softcap(cost, new Decimal(1e480), new Decimal(1).add(cost.log(1e240).minus(2))) 
+            },
+            effect(x){
+                let power = new Decimal(1).mul(new Decimal(2).pow(x))
+                power = power.times(tmp.fl.effect)
+                power = power.times(tmp.s.effect)
+                return softcap(power, new Decimal(1e16), new Decimal(1).div(power.add(2).log(1e60)))
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                return "Cost: " + format(data.cost) + " brain cells\n\
+                Amount: " + player[this.layer].buyables[this.id] + "\n\
+                Multiplies point gain by " + format(buyableEffect(this.layer, this.id))+"x"
+            },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            unlocked() { return hasChallenge('b', 22)},
         },
     },
     tabFormat: {
@@ -319,6 +459,9 @@ addLayer("a", {
         }
         if (hasChallenge('b', 11) && hasMilestone('fl', 0)){
           buyBuyable('a', 22)  
+        }
+        if (hasChallenge('b', 22) && hasMilestone('fl', 0)){
+          buyBuyable('a', 31)  
         }
     },
 })

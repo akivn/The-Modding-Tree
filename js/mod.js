@@ -3,7 +3,7 @@ let modInfo = {
 	id: "akivn",
 	author: "akivn",
 	pointsName: "points",
-	modFiles: ["layers/year1.js", "layers/year2.js","layers/year3.js", "layers/Flowers.js", "tree.js"],
+	modFiles: ["layers/year1.js", "layers/year2.js","layers/year3.js", "layers/year4.js", "layers/Flowers.js", "func.js", "layers/Fauna.js", "layers/SuperGenerator.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.31-cEP1",
-	name: "Rewritten-Beta-4 and Emergency Patch",
+	num: "0.4",
+	name: "Rewritten-Beta-5 - Year 4 Update",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -26,7 +26,13 @@ let changelog = `<h1>Changelog:</h1><br>
 		5. Year 3 IS HERE!<br>
 	<h3>v0.31-cEP1</h3> - Flora update<br>
 		1. Fixed the 1 star softlock by increasing the base of Star effect to 3.<br>
-		2. Added 1 new upgrade to Year 3.`
+		2. Added 1 new upgrade to Year 3.
+	<h3>v0.4</h3> - Year 4 update<br>
+		1. 7 new Upgrades to Year 1.<br>
+		2. 9 new Upgrades to Year 3.<br>
+		3. 7 new Challenges to Year 2.<br>
+		4. Super-Generators and Faunas! Their reincaranations and faunas can help you boost Mind-Generators!<br>
+		5. but most importantly... YEAR 4 IS HERE!!!`
 		
 
 let winText = `Congratulations! You have reached the present and beaten this game, but for now...`
@@ -56,8 +62,14 @@ function getPointGen() {
 	if(getBuyableAmount('a', 11).gte(1)) gain = gain.times(buyableEffect('a', 11))
 	if(getBuyableAmount('a', 12).gte(1)) gain = gain.times(buyableEffect('a', 12))
 	if(getBuyableAmount('a', 21).gte(1)) gain = gain.times(buyableEffect('a', 21))
+	if(getBuyableAmount('a', 22).gte(1)) gain = gain.times(buyableEffect('a', 22))
+	if(getBuyableAmount('a', 31).gte(1)) gain = gain.times(buyableEffect('a', 31))
 	gain = gain.times(tmp.b.effect)
 	if (player.c.points.gte(1)) gain = gain.times(tmp.c.effect.pow(2).times(10))
+	if(inChallenge('b', 22)) gain = gain.pow(0.5)
+	if(inChallenge('b', 31)) gain = gain.pow(0.5)
+	if(inChallenge('b', 32)) gain = gain.pow(0.5)
+	if(inChallenge('b', 42)) gain = gain.pow(0.5)
 	return gain
 }
 
@@ -67,11 +79,13 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	"<br>",
+	function() { return `<h3>Current Endgame: </h3> ${GetEffectText("h3", 1, tmp.d.color)} Robotic Part` },
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e256"))
+	return player.d.points.gte(1)
 }
 
 

@@ -8,7 +8,7 @@ addLayer("fl", {
     color: "#11aa00",                       // The color for this layer, which affects many elements.
     resource: "Flora",            // The name of this layer's main prestige resource.
     row: 1,                                 // The row this layer is on (0 is the first row).
-
+    branches: ["fa"],
     baseResource: "Brain Cells",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.a.points },  // A function to return the current amount of baseResource.
 
@@ -25,10 +25,12 @@ addLayer("fl", {
         }
     ],                        // "normal" prestige gain is (currency^exponent).
     update() {
-        let gain = new Decimal(1).times(tmp.c.effect)
+        let gain = new Decimal(1).times(tmp.c.effect).times(tmp.fa.effect)
         gain = gain.times(buyableEffect('fl', 11).div(20))
         if (hasUpgrade('b', 12)) gain = gain.times(6)
         if (hasUpgrade('a', 34)) gain = gain.times(upgradeEffect('a', 34))
+        if (hasUpgrade('a', 15)) gain = gain.times(upgradeEffect('a', 15))
+        gain = softcap(gain, new Decimal(1e100), new Decimal(0.2))
         addPoints('fl', gain)
     },
     gainMult() {
@@ -38,13 +40,20 @@ addLayer("fl", {
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
-
+    position: 2,
     layerShown() { return hasUpgrade('a', 33) || player.fl.best.gte(1) ||player.c.best.gte(1)},
     effect() {
         let effect_fl = new Decimal(1).times(player.fl.points).add(1)
         if (hasMilestone('fl', 1)) effect_fl = new Decimal(1).times(player.fl.best).add(1)
         if (inChallenge('b', 11)) effect_fl = new Decimal(1)
-        return softcap(effect_fl, new Decimal(1e10), new Decimal(1).div(new Decimal(effect_fl).pow(0.015)))
+        if (inChallenge('b', 12)) effect_fl = new Decimal(1)
+        if (hasUpgrade('a', 44)) effect_fl = effect_fl.pow(6.66)
+        effect_fl = softcap(effect_fl, new Decimal(1e10), new Decimal(0.36))
+        effect_fl = softcap(effect_fl, new Decimal(1e16), new Decimal(0.25))
+        if (hasUpgrade('c', 21)) effect_fl = softcap(effect_fl, new Decimal(1e16), new Decimal(1.5))
+        if (inChallenge('b', 42)) effect_fl = new Decimal(1)
+
+        return effect_fl
     },
     effectDescription(){
             return "boosting Year 1 Buyables by x" + format(tmp[this.layer].effect)        
@@ -60,12 +69,8 @@ addLayer("fl", {
             effect(x){
                 let power = new Decimal(1).mul(x.add(1).pow(1.4).add(1)).add(1)
                 power = power.times(buyableEffect('fl', 12))
+                if(hasUpgrade('c', 15)) power = power.times(upgradeEffect('c', 15))
                 return power
-            },
-            effect(y){
-                let power2 = new Decimal(new Decimal(0.1).mul(y)).pow(1.2).times(3)
-                power2 = power2.times(buyableEffect('fl', 12))
-                return power2
             },
             display() { let data = tmp[this.layer].buyables[this.id]
                 return "Cost: " + format(data.cost) + " Florae\n\
@@ -139,12 +144,38 @@ addLayer("fl", {
             },
             effect(x){
                 let power = new Decimal(new Decimal(1).mul(x).pow(new Decimal(1.5).pow(4))).add(1)
+                power = power.times(buyableEffect('fl', 31))
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
                 return "Cost: " + format(data.cost) + " Florae\n\
                 Amount: " + player[this.layer].buyables[this.id] + "\n\
                 Multiplying Blue Orchid effect by x" + format(buyableEffect(this.layer, this.id))
+
+            },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            unlocked() {
+                return hasChallenge('b', 11)
+            },
+        },
+        31: {
+            title: "Azure Bluet",
+            cost(x) { 
+                let cost = new Decimal(1e92).mul(new Decimal(1e6).pow(x))
+                return softcap(cost, new Decimal(1e160), new Decimal(1).times(cost.log(1e160)))
+            },
+            effect(x){
+                let power = new Decimal(10).pow(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                return "Cost: " + format(data.cost) + " Florae\n\
+                Amount: " + player[this.layer].buyables[this.id] + "\n\
+                Multiplying Allium effect by x" + format(buyableEffect(this.layer, this.id))
 
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
@@ -188,9 +219,20 @@ addLayer("fl", {
     doReset(resettingLayer) {
         let keep = []
         if (hasMilestone("c", 2)) keep.push("buyables")
-        if (layers[resettingLayer].row > this.row) layerDataReset("f", keep)
+        if (hasMilestone('c', 2)) keep.push("milestones")
+        if (layers[resettingLayer].row > this.row) layerDataReset("fl", keep)
        },
-
+    automate(){
+    if (hasMilestone('c', 3)){
+        buyBuyable('fl', 11)
+        buyBuyable('fl', 12)
+        buyBuyable('fl', 21)
+        buyBuyable('fl', 22)
+       }
+       if (hasMilestone('c', 3) && hasChallenge('b', 31)){
+        buyBuyable('fl', 31)
+       }
+},
 
 })
 
