@@ -32,7 +32,9 @@ let changelog = `<h1>Changelog:</h1><br>
 		2. 9 new Upgrades to Year 3.<br>
 		3. 7 new Challenges to Year 2.<br>
 		4. Super-Generators and Faunas! Their reincaranations and faunas can help you boost Mind-Generators!<br>
-		5. but most importantly... YEAR 4 IS HERE!!!`
+		5. but most importantly... YEAR 4 IS HERE!!!
+	<h3>v0.40a</h3> - Quickfix<br>
+		1. Fixed the robots showing the wrong display`
 		
 
 let winText = `Congratulations! You have reached the present and beaten this game, but for now...`

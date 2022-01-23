@@ -236,7 +236,7 @@ addLayer("c", {
                 return softcap(power, new Decimal(1e5), new Decimal(0.4))
             },
             display() { let data = tmp[this.layer].buyables[this.id]
-                return "Cost: " + format(data.cost) + " brain cells\n\
+                return "Cost: " + format(data.cost) + " Powers\n\
                 Amount: " + player[this.layer].buyables[this.id] + "\n\
                 Multiplies Power effect by " + format(buyableEffect(this.layer, this.id))+"x"
             },
@@ -257,7 +257,7 @@ addLayer("c", {
                 return softcap(power, new Decimal(1e5), new Decimal(0.4))
             },
             display() { let data = tmp[this.layer].buyables[this.id]
-                return "Cost: " + format(data.cost) + " brain cells\n\
+                return "Cost: " + format(data.cost) + " Powers\n\
                 Amount: " + player[this.layer].buyables[this.id] + "\n\
                 Multiplies Power effect by " + format(buyableEffect(this.layer, this.id))+"x"
             },
