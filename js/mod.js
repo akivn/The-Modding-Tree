@@ -26,7 +26,7 @@ let changelog = `<h1>Changelog:</h1><br>
 		5. Year 3 IS HERE!<br>
 	<h3>v0.31-cEP1</h3> - Flora update<br>
 		1. Fixed the 1 star softlock by increasing the base of Star effect to 3.<br>
-		2. Added 1 new upgrade to Year 3.
+		2. Added 1 new upgrade to Year 3.<br>
 	<h3>v0.4</h3> - Year 4 update<br>
 		1. 7 new Upgrades to Year 1.<br>
 		2. 9 new Upgrades to Year 3.<br>
