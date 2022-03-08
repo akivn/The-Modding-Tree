@@ -1,13 +1,13 @@
 let modInfo = {
-	name: "The History Tree",
-	id: "akivn",
+	name: "The OR History Tree Incremental",
+	id: "on9_1a12",
 	author: "akivn",
 	pointsName: "points",
-	modFiles: ["layers.js", "tree.js", "d.js"],
+	modFiles: ["layers/Year2015.js", "func.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	initialStartPoints: new Decimal (1), // Used for hard resets and new players
 	offlineLimit: 0,  // In hours
 }
 
@@ -42,21 +42,33 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(2)
-	if (hasAchievement('b', 21)) gain = gain.add(1)
-	if (hasUpgrade('a', 11)) gain = gain.times(2.4)
-	if (hasUpgrade('a', 12)) gain = gain.times(upgradeEffect('a', 12))
-	if (hasUpgrade('a', 13)) gain = gain.times(upgradeEffect('a', 13))
-	if (hasUpgrade('a', 14)) gain = gain.times(upgradeEffect('a', 14))
-	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
-	if (hasUpgrade('a', 22)) gain = gain.times(upgradeEffect('a', 22))
-	if (hasUpgrade('a', 23)) gain = gain.times(upgradeEffect('a', 23))
-	if (hasUpgrade('c', 13)) gain = gain.times(upgradeEffect('c', 13))
-	if (inChallenge('c', 12)) gain = gain.pow(0.5)
-	if (hasMilestone('a', 0)) gain = gain.times(tmp.a.milestones[0].effect)
+	multi = new Decimal(1.01)
+	if (hasUpgrade('a', 11)) multi = multi.add(upgradeEffect('a', 11))
+	if (hasUpgrade('a', 12)) multi = multi.add(upgradeEffect('a', 12))
+	if (hasUpgrade('a', 13)) multi = multi.add(upgradeEffect('a', 13))
+	if (hasUpgrade('a', 14)) multi = multi.add(upgradeEffect('a', 14))
+	if (hasUpgrade('a', 32)) multi = multi.times(upgradeEffect('a', 32))
+	if (hasUpgrade('a', 33)) multi = multi.times(upgradeEffect('a', 33))
+	if (hasUpgrade('a', 41)) multi = multi.times(upgradeEffect('a', 41))
+	if (hasUpgrade('a', 42)) multi = multi.times(upgradeEffect('a', 42))
+	if (hasUpgrade('a', 43)) multi = multi.pow(upgradeEffect('a', 43))
+	if (hasUpgrade('a', 44)) multi = multi.pow(upgradeEffect('a', 44))
+	if (hasUpgrade('a', 51)) multi = multi.pow(upgradeEffect('a', 51))
+	if (hasUpgrade('a', 52)) multi = multi.pow(upgradeEffect('a', 52))
+	if (hasUpgrade('a', 53)) multi = multi.pow(upgradeEffect('a', 53))
+	if (hasUpgrade('a', 54)) multi = multi.pow(upgradeEffect('a', 54))
+
 	
-	gain = gain.times(tmp.b.effect)
-	gain = gain.times(tmp.c.effect)
+	
+	let gain = new Decimal(multi.minus(1)).times(player.points)
+	if (!hasUpgrade('a', 22)) gain = softcap(gain, new Decimal(10), new Decimal(1).div(gain.log(1e10).add(1)))
+	if (!hasUpgrade('a', 31)) gain = softcap(gain, new Decimal(1e22), new Decimal(1).div(gain.log(1e75).add(1)))
+	if (hasUpgrade('a', 31) && !hasUpgrade('a', 32) && !hasUpgrade('a', 42)) gain = softcap(gain, new Decimal(1e22), new Decimal(1).div(gain.log('1e375').add(1)))
+	if (hasUpgrade('a', 31) && hasUpgrade('a', 32) && !hasUpgrade('a', 42)) gain = softcap(gain, new Decimal(1e22), new Decimal(1).div(gain.log('1e750').add(1)))
+	if (hasUpgrade('a', 42) && !hasUpgrade('a', 51)) gain = softcap(gain, new Decimal('1e500'), new Decimal(1).div(gain.log('1e10000').add(1).pow(0.01)))
+	if (hasUpgrade('a', 51)) gain = softcap(gain, new Decimal('1e500'), new Decimal(1).div(gain.log('1e10000').add(1).pow(0.0004)))
+	if (!hasUpgrade('a', 54)) gain = softcap(gain, new Decimal('ee10'), new Decimal(1).div(gain.log(10).log(10)))
+	if (hasUpgrade('a', 21)) gain = gain.add(upgradeEffect('a', 21))
 	return gain
 }
 
@@ -66,11 +78,13 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	"<br>",
+	function() { return `<h0>Multiplier:</h0> ${GetEffectText("h0", format(multi), tmp.a.color)}x` },	
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e83"))
+	return multi.gte(new Decimal("eeeee10"))
 }
 
 
