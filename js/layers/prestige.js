@@ -66,7 +66,7 @@ addLayer("p", {
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked(){
-                return true
+                return hasUpgrade('p', 11)
             },
         },
         13: {
@@ -80,7 +80,7 @@ addLayer("p", {
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked(){
-                return true
+                return hasUpgrade('p', 12)
             },
         },
         21: {
@@ -92,7 +92,7 @@ addLayer("p", {
                 return power
             },
             unlocked(){
-                return true
+                return hasUpgrade('p', 13)
             },
         },
         22: {
@@ -104,7 +104,7 @@ addLayer("p", {
                 return power
             },
             unlocked(){
-                return true
+                return hasUpgrade('p', 13)
             },
         },
         23: {
@@ -112,7 +112,7 @@ addLayer("p", {
             description: "Unlock Generators.",
             cost: new Decimal(10000),
             unlocked(){
-                return true
+                return hasUpgrade('p', 13)
             },
         },
         31: {
@@ -159,7 +159,7 @@ addLayer("p", {
             description: "Unlock Challenges.",
             cost: new Decimal(1e24),
             unlocked(){
-                return true
+                return (hasMilestone("lp",0))
             },
         },
     },
