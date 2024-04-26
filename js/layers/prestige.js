@@ -51,9 +51,7 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
-            unlocked(){
-                return true
-            },
+            unlocked(){ return true },
         },
         12: {
             title: "Boost II",
@@ -65,9 +63,7 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
-            unlocked(){
-                return hasUpgrade('p', 11)
-            },
+            unlocked(){ return hasUpgrade('p', 11) },
         },
         13: {
             title: "Boost III",
@@ -79,9 +75,7 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
-            unlocked(){
-                return hasUpgrade('p', 12)
-            },
+            unlocked(){ return hasUpgrade('p', 12) },
         },
         21: {
             title: "Boost Ia",
@@ -91,9 +85,7 @@ addLayer("p", {
                 let power = new Decimal(2)
                 return power
             },
-            unlocked(){
-                return hasUpgrade('p', 13)
-            },
+            unlocked(){ return hasUpgrade('p', 13) },
         },
         22: {
             title: "Boost IIa",
@@ -103,17 +95,13 @@ addLayer("p", {
                 let power = new Decimal(2)
                 return power
             },
-            unlocked(){
-                return hasUpgrade('p', 13)
-            },
+            unlocked(){ return hasUpgrade('p', 13) },
         },
         23: {
             title: "Unlock!",
             description: "Unlock Generators.",
             cost: new Decimal(10000),
-            unlocked(){
-                return hasUpgrade('p', 13)
-            },
+            unlocked(){ return hasUpgrade('p', 13) },
         },
         31: {
             title: "Light Absorber",
@@ -124,9 +112,7 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
-            unlocked(){
-                return (hasMilestone("lp",0))
-            },
+            unlocked(){ return (hasMilestone("lp",0)) },
         },
         32: {
             title: "Effienciency",
@@ -137,9 +123,7 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return "+" + format(upgradeEffect(this.layer, this.id)) },
-            unlocked(){
-                return (hasMilestone("lp",0))
-            },
+            unlocked(){ return (hasMilestone("lp",0)) },
         },
         33: {
             title: "Light Absorber II",
@@ -150,17 +134,13 @@ addLayer("p", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
-            unlocked(){
-                return (hasMilestone("lp",0))
-            },
+            unlocked(){ return (hasMilestone("lp",0)) },
         },
         34: {
             title: "Unlock! II",
             description: "Unlock Challenges.",
             cost: new Decimal(1e24),
-            unlocked(){
-                return (hasMilestone("lp",0))
-            },
+            unlocked(){ return (hasMilestone("lp",0)) },
         },
     },
     buyables: {
