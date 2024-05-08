@@ -1,13 +1,13 @@
 let modInfo = {
-	name: "The ??? Tree",
-	id: "mymod",
-	author: "nobody",
-	pointsName: "points",
-	modFiles: ["layers.js", "tree.js"],
+	name: "The Art Tree Rewritten",
+	id: "art2",
+	author: "akivn",
+	pointsName: "Experience",
+	modFiles: ["layers/art.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
 	offlineLimit: 1,  // In hours
 }
 
@@ -39,10 +39,9 @@ function canGenPoints(){
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!canGenPoints())
-		return new Decimal(0)
-
-	let gain = new Decimal(1)
+	let gain = new Decimal(0)
+	if (player.a.progress) gain = new Decimal(tmp.a.art.perSecond)
+	gain = gain.times(tmp.b.effect)
 	return gain
 }
 
@@ -52,6 +51,9 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	function() {
+		return
+	}
 ]
 
 // Determines when the game "ends"
