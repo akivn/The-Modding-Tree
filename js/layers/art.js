@@ -7,10 +7,25 @@ addLayer("a", {
         progress: false,
         art: new Decimal(0),
         totalArt: new Decimal(0),
-        auto: true,
-        buyableAuto: true,
+        auto() {
+            if (!player.a.auto) return false
+            else return true
+        },
+        buyableAuto() {
+            if (!player.a.buyableAuto) return false
+            else return true
+        },
         bulk: false,
         artworkPerSecond: new Decimal(0),
+        artspace: new Decimal(0),
+        bought1: new Decimal(0),
+        bought2: new Decimal(0),
+        bought3: new Decimal(0),
+        bought4: new Decimal(0),
+        bought5: new Decimal(0),
+        bought6: new Decimal(0),
+        bought7: new Decimal(0),
+        bought8: new Decimal(0),
     }},
     branches: ['b', 'g'],
     color: "#20A0D4",
@@ -36,10 +51,12 @@ addLayer("a", {
         if (hasUpgrade('a', 13)) multi = multi.times(upgradeEffect('a', 13))
         if (hasUpgrade('b', 13)) multi = multi.times(upgradeEffect('b', 13))
         multi = multi.times(tmp.b.effect)
+        multi = multi.times(tmp.a.artspace.effect)
         return multi
     },
     exp(){
         let exp = new Decimal(1)
+        if (hasUpgrade('b', 21)) exp = exp.times(1.2)
         return exp
     },
     art: {
@@ -49,6 +66,8 @@ addLayer("a", {
             if (hasUpgrade('a', 11)) perSecond = perSecond.times(upgradeEffect('a', 11))
             if (hasUpgrade('b', 11)) perSecond = perSecond.times(upgradeEffect('b', 11))
             if (hasMilestone('b', 1)) perSecond = perSecond.times(4)
+                perSecond = perSecond.times(tmp.g.power.effect)
+            if (player.a.resetTime<=0.07) perSecond = new Decimal(0)
             return perSecond
         }
     },
@@ -59,6 +78,18 @@ addLayer("a", {
             else player.a.bulk = false
             return perSecond
         }
+    },
+    artspace: {
+        perSecond() {
+            let perSecond = buyableEffect('a', 101)
+            if (player.a.resetTime<=0.07) perSecond = new Decimal(0)
+            return perSecond
+        },
+        effect() {
+            let effect = player.a.artspace.pow(0.4).add(1)
+            effect = effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(25).add(1).pow(0.07)))  
+            return effect
+        },
     },
     update(delta) {
         if (hasMilestone('b', 0) && player.a.auto) player.a.progress = true
@@ -79,6 +110,9 @@ addLayer("a", {
                 buyBuyable("a", "enlarge")
             }
         };
+        player.a.artspace = player.a.artspace.add(Decimal.times(tmp.a.artspace.perSecond, delta));
+        player.a.buyables[101] = player.a.buyables[101].add(Decimal.times(tmp.a.buyables[102].effect, delta));
+        player.a.buyables[102] = player.a.buyables[102].add(Decimal.times(tmp.a.buyables[103].effect, delta));
     },
     buyables: {
         "expboost": {
@@ -144,6 +178,105 @@ addLayer("a", {
             style() {
             }, 
         },
+        101: {
+            title: "Art Dimension 1",
+            cost() { 
+                let base = new Decimal(1e3)
+                let cost = new Decimal(base).pow(player.a.bought1).times(1e24)
+                cost = softcap(cost, new Decimal(1e40), new Decimal(1).add(cost.add(10).log(10).minus(20).div(20).minus(1)).pow(0.076))
+                return cost 
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought1)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought1, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought1 = player.a.bought1.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
+        },
+        102: {
+            title: "Art Dimension 2",
+            cost() { 
+                let base = new Decimal(1e5)
+                let cost = new Decimal(base).pow(player.a.bought2).times(1e28)
+                cost = softcap(cost, new Decimal(1e48), new Decimal(1).add(cost.add(10).log(10).minus(28).div(20).minus(1)).pow(0.076))
+                return cost 
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought2)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought2, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought2 = player.a.bought2.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
+        },
+        103: {
+            title: "Art Dimension 3",
+            cost() { 
+                let base = new Decimal(1e7)
+                let cost = new Decimal(base).pow(player.a.bought3).times(1e32)
+                cost = softcap(cost, new Decimal(1e56), new Decimal(1).add(cost.add(10).log(10).minus(32).div(24).minus(1)).pow(0.076))
+                return cost 
+            },
+            effect(x){
+                let power = new Decimal(2).pow(player.a.bought3).times(x)
+                return power
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought3)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought3, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought3 = player.a.bought3.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
+        },
 
     },
     upgrades:{
@@ -196,6 +329,7 @@ addLayer("a", {
                 let req = new Decimal(10)
                 req = req.times(tmp.a.buyables["enlarge"].effect)
                 if (hasUpgrade('a', 12)) req = req.times(upgradeEffect('a', 12))
+                if (hasUpgrade('g', 11)) req = req.times(upgradeEffect('g', 11))
                 return req
             },
             progress() {
@@ -215,7 +349,6 @@ addLayer("a", {
                     "background-color": ("rgb(" + r + ", " + g + ", " + b + ")")
                 }
             },
-            instant: true
         },
     },
     tabFormat: {
@@ -243,10 +376,28 @@ addLayer("a", {
                 "blank",
                 function() {if (!player.a.auto) return ["clickable", "art"]},
                 "blank",
-                ["row", [["buyable", "expboost"], ["buyable", "enlarge"]]],
+                ["row", [["buyable", "expboost"], "blank", ["buyable", "enlarge"]]],
                 "blank",
                 "upgrades",
             ],
+        },
+        "Dimensions": {
+            content: [
+                "main-display",
+                ['raw-html', function() {
+                    return `<div><span v-if="player.a.artspace.lt('1e1000')">You have </span><h2 v-bind>${format(player.a.artspace)}</h2> Artspaces<br><br></div>`}
+                ],
+                ['display-text', function() {
+                    return `Your Artspace is boosting Art gain by ${format(tmp.a.artspace.effect)}x`}, { 'font-size': '15px', 'color': 'silver'}],
+                ['display-text', function() {
+                    return `Artspace gain: ${format(tmp.a.artspace.perSecond)} / sec` }, { 'font-size': '15px', 'color': 'silver'}
+                ],
+                "blank",
+                ["buyable", 101],
+                ["buyable", 102],
+                ["buyable", 103],
+            ],
+            unlocked() {return hasUpgrade('g', 13)}
         },
     },
     doReset(prestige) {
@@ -254,22 +405,17 @@ addLayer("a", {
         if (layers[prestige].row <= this.row) return;
     
         // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
-        let keptUpgrades = [];
-        for(i=4;i<5;i++){ //rows
-            for(v=1;v<2;v++){ //columns
-                if (hasUpgrade(this.layer, i+v*10)) keptUpgrades.push(i+v*10)
-              }
-        }
+        let keptBuyables = [];
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
-        if (hasMilestone('b', 2)) keep.push("upgrades")
+        if ((hasMilestone('b', 2) && layers[prestige].position == 1) || (hasMilestone('g', 0) && layers[prestige].position == 2)) keep.push("upgrades")
     
         // Stage 4, do the actual data reset
         layerDataReset(this.layer, keep);
     
         // Stage 5, add back in the specific subfeatures you saved earlier
-        player[this.layer].upgrades.push(...keptUpgrades);
+        player[this.layer].buyables.push(...keptBuyables);
     },
 
     layerShown(){return true}

@@ -7,7 +7,7 @@ addLayer("b", {
     }},
     branches: ['g'],
     color: "#6e64c4",                       // The color for this layer, which affects many elements.
-    resource: "Booster",            // The name of this layer's main prestige resource.
+    resource: "Boosters",            // The name of this layer's main prestige resource.
     row: 1,                                   // The row this layer is on (0 is the first row).
     position: 1,
 
@@ -42,7 +42,9 @@ addLayer("b", {
     passiveGeneration() {
     },
     effect() {
-        let effect = new Decimal(2).pow(player[this.layer].points)
+        let base = new Decimal(2)
+        if (hasAchievement('ac', 25)) base = base.add(achievementEffect('ac', 25))
+        let effect = new Decimal(base).pow(player[this.layer].points)
         softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(10).pow(0.5).add(1)))
         return effect
     },
@@ -60,7 +62,7 @@ addLayer("b", {
         },
         2: {requirementDescription: "10 Boosters",
             done() {return player[this.layer].best.gte(10)}, // Used to determine when to give the milestone
-            effectDescription: "Unlock Automation for Art Buyables, and keep your Upgrades on Booster resets.",
+            effectDescription: "Unlock Automation for Art Buyables, and keep your Art Upgrades on Booster resets.",
         },
     },
 
@@ -99,14 +101,51 @@ addLayer("b", {
             cost: new Decimal(10),
             unlocked(){ return true },
         },
+        21: {
+            title: "WE NEED MORE ART",
+            description: "Art gain is raised to ^1.11.",
+            cost: new Decimal(12),
+            unlocked(){ return hasUpgrade('b', 14) },
+        },
+        22: {
+            title: "Generation Boost",
+            description: "Generator Power gain is boosted by your Boosters.",
+            cost: new Decimal(14),
+            effect() {
+                let power = player.b.points.add(1).pow(1.5)
+                power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(5).add(1).pow(0.07)))  
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true },
+        },
+        23: {
+            title: "Arty Madness",
+            description: "Every Booster you get boosts Art Dimensions by x1.06.",
+            cost: new Decimal(18),
+            effect() {
+                let power = new Decimal(1.06).pow(player.b.points)
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true },
+        },
     },
     tabFormat: {
         "Main": {
             content: [
                 "main-display",
                 "prestige-button",
-                "milestones",
+                "blank",
                 "upgrades",
+            ],
+        },
+        "Milestones": {
+            content: [
+                "main-display",
+                "prestige-button",
+                "blank",
+                "milestones",
             ],
         },
     },

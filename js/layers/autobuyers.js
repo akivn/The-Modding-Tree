@@ -34,7 +34,7 @@ addLayer("ab", {
                 }
             },
         },
-        11: {
+        12: {
             title: "Art Buyable",
             display() {
                 return hasMilestone("b", 2) ? (player.a.buyableAuto ? "On" : "Off") : "Locked"
@@ -50,7 +50,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.a.auto ? "#6e64c4" : "#666666"
+                    return player.a.buyableAuto ? "#6e64c4" : "#666666"
                 }
             },
         },
