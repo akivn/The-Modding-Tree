@@ -56,6 +56,9 @@ addLayer("g", {
             if (hasMilestone('g', 0)) effect = effect.times(3)
             if (player.g.points.lte(0)) effect = new Decimal(0)
             if (hasUpgrade('b', 22)) effect = effect.times(upgradeEffect('b', 22))
+            if (hasUpgrade('a', 21)) effect = effect.times(upgradeEffect('a', 21))
+            effect = effect.times(tmp.h.effect)
+            if (hasMilestone('h', 0)) effect = effect.add(tmp.g.limit.effect.minus(player.g.power).times(0.02))
             if (player.g.power.gte(tmp.g.limit.effect)) effect = new Decimal(0)
             return effect
         },
@@ -119,6 +122,7 @@ addLayer("g", {
             },
             effect(x){
                 let power = new Decimal(1).add(x.times(0.3)).pow(0.7)
+                if (hasUpgrade('a', 23)) power = new Decimal(1).add(x.times(0.35)).pow(0.73)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]

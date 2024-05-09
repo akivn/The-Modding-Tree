@@ -5,7 +5,7 @@ addLayer("b", {
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
-    branches: ['g'],
+    branches: ['g', 'h'],
     color: "#6e64c4",                       // The color for this layer, which affects many elements.
     resource: "Boosters",            // The name of this layer's main prestige resource.
     row: 1,                                   // The row this layer is on (0 is the first row).
@@ -129,6 +129,12 @@ addLayer("b", {
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked(){ return true },
+        },
+        24: {
+            title: "Powerup Tools",
+            description: "Unlock 4 more Art Upgrades",
+            cost: new Decimal(20),
+            unlocked(){ return hasUpgrade('b', 14) },
         },
     },
     tabFormat: {

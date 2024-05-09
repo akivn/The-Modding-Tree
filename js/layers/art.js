@@ -8,11 +8,11 @@ addLayer("a", {
         art: new Decimal(0),
         totalArt: new Decimal(0),
         auto() {
-            if (!player.a.auto) return false
+            if (!player.a.auto || !hasMilestone('b', 0)) return false
             else return true
         },
         buyableAuto() {
-            if (!player.a.buyableAuto) return false
+            if (!player.a.buyableAuto || !hasMilestone('b', 2)) return false
             else return true
         },
         bulk: false,
@@ -26,6 +26,8 @@ addLayer("a", {
         bought6: new Decimal(0),
         bought7: new Decimal(0),
         bought8: new Decimal(0),
+        dimshift: new Decimal(0),
+        dimboost: new Decimal(0),
     }},
     branches: ['b', 'g'],
     color: "#20A0D4",
@@ -57,6 +59,7 @@ addLayer("a", {
     exp(){
         let exp = new Decimal(1)
         if (hasUpgrade('b', 21)) exp = exp.times(1.2)
+        if (hasUpgrade('a', 22)) exp = exp.times(1.05)
         return exp
     },
     art: {
@@ -66,7 +69,8 @@ addLayer("a", {
             if (hasUpgrade('a', 11)) perSecond = perSecond.times(upgradeEffect('a', 11))
             if (hasUpgrade('b', 11)) perSecond = perSecond.times(upgradeEffect('b', 11))
             if (hasMilestone('b', 1)) perSecond = perSecond.times(4)
-                perSecond = perSecond.times(tmp.g.power.effect)
+            perSecond = perSecond.times(tmp.g.power.effect)
+            perSecond = perSecond.times(tmp.h.effect)
             if (player.a.resetTime<=0.07) perSecond = new Decimal(0)
             return perSecond
         }
@@ -113,6 +117,7 @@ addLayer("a", {
         player.a.artspace = player.a.artspace.add(Decimal.times(tmp.a.artspace.perSecond, delta));
         player.a.buyables[101] = player.a.buyables[101].add(Decimal.times(tmp.a.buyables[102].effect, delta));
         player.a.buyables[102] = player.a.buyables[102].add(Decimal.times(tmp.a.buyables[103].effect, delta));
+        player.a.buyables[103] = player.a.buyables[103].add(Decimal.times(tmp.a.buyables[104].effect, delta));
     },
     buyables: {
         "expboost": {
@@ -183,16 +188,16 @@ addLayer("a", {
             cost() { 
                 let base = new Decimal(1e3)
                 let cost = new Decimal(base).pow(player.a.bought1).times(1e24)
-                cost = softcap(cost, new Decimal(1e40), new Decimal(1).add(cost.add(10).log(10).minus(20).div(20).minus(1)).pow(0.076))
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(10).log(2).minus(1024).div(512).minus(1)).pow(0.15))
                 return cost 
-            },
-            effect(x){
-                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
-                return power
             },
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought1)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -216,16 +221,16 @@ addLayer("a", {
             cost() { 
                 let base = new Decimal(1e5)
                 let cost = new Decimal(base).pow(player.a.bought2).times(1e28)
-                cost = softcap(cost, new Decimal(1e48), new Decimal(1).add(cost.add(10).log(10).minus(28).div(20).minus(1)).pow(0.076))
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(10).log(2).minus(1024).div(512).minus(1)).pow(0.15))
                 return cost 
-            },
-            effect(x){
-                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
-                return power
             },
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought2)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -249,16 +254,16 @@ addLayer("a", {
             cost() { 
                 let base = new Decimal(1e7)
                 let cost = new Decimal(base).pow(player.a.bought3).times(1e32)
-                cost = softcap(cost, new Decimal(1e56), new Decimal(1).add(cost.add(10).log(10).minus(32).div(24).minus(1)).pow(0.076))
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(10).log(2).minus(1024).div(512).minus(1)).pow(0.15))
                 return cost 
-            },
-            effect(x){
-                let power = new Decimal(2).pow(player.a.bought3).times(x)
-                return power
             },
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought3)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -277,6 +282,40 @@ addLayer("a", {
                 return {height: '66px', width: '200px'}
             }, 
         },
+        104: {
+            title: "Art Dimension 4",
+            cost() { 
+                let base = new Decimal(1e9)
+                let cost = new Decimal(base).pow(player.a.bought4).times(1e36)
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(10).log(2).minus(1024).div(512).minus(1)).pow(0.15))
+                return cost 
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought4)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought4, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought4 = player.a.bought4.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
+        },
+
 
     },
     upgrades:{
@@ -319,6 +358,40 @@ addLayer("a", {
             cost: new Decimal(500),
             unlocked(){ return hasUpgrade('a', 13) || player.b.unlocked },
         },
+        21: {
+            title: "Power Stream",
+            description: "Artspace boosts your Generator Power gain.",
+            effect() {
+                let power = new Decimal(player.a.artspace.add(10).log(10).pow(2))
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            cost: new Decimal(1e34),
+            unlocked(){ return hasUpgrade('b', 24) },
+        },
+        22: {
+            title: "Enlargement",
+            description: "Artwork Size is bigger based on your Boosters, but gain a ^1.05 boost to Art gain per Artwork needed.",
+            effect() {
+                let power = new Decimal(1.2).pow(player.b.points)
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            cost: new Decimal(1e42),
+            unlocked(){ return hasUpgrade('b', 24) },
+        },
+        23: {
+            title: "Scaling Up",
+            description: "Effect Increaser is more powerful.",
+            cost: new Decimal(1e46),
+            unlocked(){ return hasUpgrade('b', 24) },
+        },
+        24: {
+            title: "Completion",
+            description: "Unlock Honour.",
+            cost: new Decimal(1e50),
+            unlocked(){ return hasUpgrade('b', 24) },
+        },
     },
     bars: {
         Art: {
@@ -329,6 +402,7 @@ addLayer("a", {
                 let req = new Decimal(10)
                 req = req.times(tmp.a.buyables["enlarge"].effect)
                 if (hasUpgrade('a', 12)) req = req.times(upgradeEffect('a', 12))
+                if (hasUpgrade('a', 22)) req = req.times(upgradeEffect('a', 22))
                 if (hasUpgrade('g', 11)) req = req.times(upgradeEffect('g', 11))
                 return req
             },
@@ -396,6 +470,7 @@ addLayer("a", {
                 ["buyable", 101],
                 ["buyable", 102],
                 ["buyable", 103],
+                ["buyable", 104],
             ],
             unlocked() {return hasUpgrade('g', 13)}
         },
@@ -405,7 +480,12 @@ addLayer("a", {
         if (layers[prestige].row <= this.row) return;
     
         // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
-        let keptBuyables = [];
+        let keptUpgrades = [];
+        for(i=4;i<5;i++){ //rows
+            for(v=1;v<2;v++){ //columns
+                if (hasUpgrade(this.layer, i+v*10)) keptUpgrades.push(i+v*10)
+            }
+        }
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
@@ -415,7 +495,9 @@ addLayer("a", {
         layerDataReset(this.layer, keep);
     
         // Stage 5, add back in the specific subfeatures you saved earlier
-        player[this.layer].buyables.push(...keptBuyables);
+        player[this.layer].upgrades.push(...keptUpgrades);
+        if (!hasMilestone('b', 0)) player.a.auto = false
+        if (!hasMilestone('b', 2)) player.a.buyableAuto = false
     },
 
     layerShown(){return true}
