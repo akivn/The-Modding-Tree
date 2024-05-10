@@ -14,6 +14,8 @@ function getStartOptions() {
 		forceOneTab: false,
 		oldStyle: false,
 		tooltipForcing: true,
+		dandereMode: true,
+		imageNode: true,
 	}
 }
 

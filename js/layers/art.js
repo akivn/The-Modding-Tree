@@ -33,6 +33,17 @@ addLayer("a", {
         dimshift: new Decimal(0),
         dimboost: new Decimal(0),
     }},
+    nodeStyle() {
+        return options.imageNode ? {
+            'color': 'white',
+            'background-image': 'url("resources/water-color-background-png_71008.jpg")',
+            'background-position': 'center center',
+            'background-size': '160%',
+            'border': '1px solid white'
+        } : {
+            'background-image': 'radial-gradient(circle at center, #20A0D4, #10506A)'
+        }
+    },
     branches: ['b', 'g', 'h'],
     color: "#20A0D4",
     resource: "Arts", // Name of prestige currency
@@ -56,6 +67,7 @@ addLayer("a", {
         multi = multi.times(tmp.a.bars.Art.req).div(10)
         if (hasUpgrade('a', 13)) multi = multi.times(upgradeEffect('a', 13))
         if (hasUpgrade('b', 13)) multi = multi.times(upgradeEffect('b', 13))
+        if (hasUpgrade('a', 31)) multi = multi.times(upgradeEffect('a', 31))
         multi = multi.times(tmp.b.effect)
         multi = multi.times(tmp.a.artspace.effect)
         return multi
@@ -65,6 +77,11 @@ addLayer("a", {
         if (hasUpgrade('b', 21)) exp = exp.times(1.2)
         if (hasUpgrade('a', 22)) exp = exp.times(1.05)
         return exp
+    },
+    multi2() {
+        let multi = new Decimal(1)
+        if (player.br.buff.gte(2)) multi = multi.times(tmp.br.effect2)
+        return multi
     },
     art: {
         perSecond() {
@@ -96,7 +113,8 @@ addLayer("a", {
         effect() {
             let effect = player.a.artspace.pow(0.4).add(1)
             let base = new Decimal(0.625)
-            if (hasUpgrade('h', 14)) base = upgradeEffect('h', 14)
+            if (hasUpgrade('br', 11)) base = upgradeEffect('br', 11)
+            else if (hasUpgrade('h', 14)) base = upgradeEffect('h', 14)
             effect = effect = softcap(effect, new Decimal(1e6), new Decimal(1).div(effect.log(10).div(4).add(1).pow(base)))  
             return effect
         },
@@ -105,13 +123,13 @@ addLayer("a", {
         if (hasMilestone('b', 0) && player.a.auto) player.a.progress = true
         if (player.a.progress && !player.a.bulk) player.a.art = player.a.art.add(Decimal.times(tmp.a.art.perSecond, delta));
         if (tmp.a.bars.Art.progress>=1 && !player.a.bulk) {
-            player.a.points = player.a.points.add(tmp.a.multi.pow(tmp.a.exp)).floor()
+            player.a.points = player.a.points.add(tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2)).floor()
             player.a.totalArt = player.a.totalArt.add(1)
             player.a.art = new Decimal(0)
             if (!hasMilestone('b', 0) || !player.a.auto) player.a.progress = false
         };
         if (player.a.bulk) {
-            player.a.points = player.a.points.add((tmp.a.multi.pow(tmp.a.exp)).floor().times(Decimal.times(tmp.a.artworkPerSecond.perSecond, delta)))
+            player.a.points = player.a.points.add((tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2)).floor().times(Decimal.times(tmp.a.artworkPerSecond.perSecond, delta)))
             player.a.totalArt = player.a.totalArt.add(Decimal.times(tmp.a.artworkPerSecond.perSecond, delta))
         };
         player.a.artspace = player.a.artspace.add(Decimal.times(tmp.a.artspace.perSecond, delta));
@@ -121,6 +139,7 @@ addLayer("a", {
         player.a.buyables[104] = player.a.buyables[104].add(Decimal.times(tmp.a.buyables[105].effect, delta));
         player.a.buyables[105] = player.a.buyables[105].add(Decimal.times(tmp.a.buyables[106].effect, delta));
         player.a.buyables[106] = player.a.buyables[106].add(Decimal.times(tmp.a.buyables[107].effect, delta));
+        player.a.buyables[107] = player.a.buyables[107].add(Decimal.times(tmp.a.buyables[108].effect, delta));
 
     },
     buyables: {
@@ -439,6 +458,41 @@ addLayer("a", {
             },
             unlocked() {return hasMilestone('h', 7)} 
         },
+        108: {
+            title: "Art Dimension 8",
+            cost() { 
+                let base = new Decimal(1e17)
+                let cost = new Decimal(base).pow(player.a.bought8).times(1e160)
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(2).log(2).minus(512).div(512).minus(1)).pow(0.1))
+                return cost 
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought8)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought8, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought8 = player.a.bought8.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            },
+            unlocked() {return hasMilestone('h', 8)} 
+        },
     },
     
     upgrades:{
@@ -487,8 +541,9 @@ addLayer("a", {
             cost: new Decimal(1e33),
             effect() {
                 let base = new Decimal(0.0375)
-                let power = player.a.points.pow(base)
+                let power = player.a.points.add(1).pow(base)
                 power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(5).add(1).pow(0.075)))  
+                if (hasUpgrade('br', 12)) power = power.pow(1.3)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -503,25 +558,71 @@ addLayer("a", {
         23: {
             title: "Generator Tomozaki",
             description: "Generator's base to Generator Power gain is increased based on your Art.",
+            cost: new Decimal(1e43),
             effect() {
                 let power = player.a.points.add(10).log(10).div(30)
                 return power
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id), 4)}` },
-            cost: new Decimal(1e43),
             unlocked(){ return hasUpgrade('b', 24) },
         },
         24: {
             title: "Receive Honour",
             description: "Unlock a new layer, and Artspace production is boosted by your Boosters.",
+            cost: new Decimal(1e47),
             effect() {
                 let power = new Decimal(1.222).pow(player.b.points)
+                if (player.br.buff.gte(1)) power = power.pow(tmp.br.effect1)
                 power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(10).add(1).pow(0.167)))  
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
-            cost: new Decimal(1e47),
             unlocked(){ return hasUpgrade('b', 24) },
+        },
+        31: {
+            title: "Upgrade Mastery",
+            description: "Each bought Art Upgrade give a 1.3x boost to both Art and Experience. (Affected by exponents!)",
+            cost: new Decimal(1e203),
+            effect() {
+                let length = new Decimal(0)
+                for(i=1;i<5;i++){ //rows
+                    for(v=1;v<4;v++){ //columns
+                        if (hasUpgrade(this.layer, i+v*10)) length = length.add(1)
+                      }
+                }
+                let power = new Decimal(1.3).pow(length) 
+                return power
+            },
+            effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
+            unlocked(){ return hasUpgrade('sb', 12) },
+        },
+        32: {
+            title: "Everyday Level Up!!",
+            description: "Super Boosters affect Breakthrough XP gain. (nb: This is a reference to ご注文はうさぎですか？？)",
+            cost: new Decimal(1e228),
+            effect() {
+                let power = new Decimal(1.5).pow(player.sb.points)
+                return power
+            },
+            effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
+            unlocked(){ return hasUpgrade('sb', 12) },
+        },
+        33: {
+            title: "Generation II",
+            description: "Divide Generator requirement based on your Breakthrough Level.",
+            cost: new Decimal(1e253),
+            effect() {
+                let power = new Decimal(10).pow(player.br.level)
+                return power
+            },
+            effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}` },
+            unlocked(){ return hasUpgrade('sb', 12) },
+        },
+        34: {
+            title: "Colourful Canvas!",
+            description: "All buffs in Breakthrough are raised to ^1.1.",
+            cost: new Decimal(1e278),
+            unlocked(){ return hasUpgrade('sb', 12) },
         },
     },
     bars: {
@@ -573,9 +674,9 @@ addLayer("a", {
                 ['display-text', function() {
                     return `Total Artworks completed: ${format(player.a.totalArt)}` }, { 'font-size': '15px', 'color': 'silver'}],
                 ['display-text', function() {
-                    return `You gain ${format(tmp.a.multi.pow(tmp.a.exp).floor())} Art per completed Artwork` }, { 'font-size': '15px', 'color': 'silver'}],
+                    return `You gain ${format(tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2).floor())} Art per completed Artwork` }, { 'font-size': '15px', 'color': 'silver'}],
                 ['display-text', function() {
-                    if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).floor()))} Arts per second`
+                    if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2).floor()))} Arts per second`
                     else return }, { 'font-size': '15px', 'color': 'silver'}],
                 "blank",
                 function() {if (!player.a.auto) return ["clickable", "art"]},
@@ -604,6 +705,7 @@ addLayer("a", {
                 ["buyable", 105],
                 ["buyable", 106],
                 ["buyable", 107],
+                ["buyable", 108],
             ],
             unlocked() {return hasUpgrade('g', 13)}
         },
@@ -643,6 +745,7 @@ addLayer("a", {
                 if (tmp.a.buyables[105].unlocked) buyBuyable('a', 105)
                 if (tmp.a.buyables[106].unlocked) buyBuyable('a', 106)
                 if (tmp.a.buyables[107].unlocked) buyBuyable('a', 107)
+                if (tmp.a.buyables[108].unlocked) buyBuyable('a', 108)
             }
         }
         if (player.a.buyableAuto && hasMilestone("b", 2)) {

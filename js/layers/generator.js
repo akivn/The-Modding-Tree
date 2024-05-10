@@ -14,6 +14,17 @@ addLayer("g", {
             else return true
         },
     }},
+    nodeStyle() {
+        return options.imageNode ? {
+            'color': 'white',
+            'background-image': 'url("resources/generators.jpeg")',
+            'background-position': 'center center',
+            'background-size': '120%',
+            'border': '1px solid white'
+        } : {
+            'background-image': 'radial-gradient(circle at center, #80ff80, #408040)'
+        }
+    },
     branches: [],
     color: "#80ff80",                       // The color for this layer, which affects many elements.
     resource: "Generators",            // The name of this layer's main prestige resource.
@@ -50,6 +61,7 @@ addLayer("g", {
 
     gainMult() {
         let mult = new Decimal(1)                          // Returns your multiplier to your gain of the prestige resource.
+        if (hasUpgrade('a', 33)) mult = mult.div(upgradeEffect('a', 33))
         return mult              // Factor in any bonuses multiplying gain here.
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
@@ -87,6 +99,7 @@ addLayer("g", {
             if (getBuyableAmount('g', "limitup").gt(0)) effect = effect.times(tmp.g.buyables["limitup"].effect)
             if (hasUpgrade('g', 12)) effect = effect.times(upgradeEffect('g', 12))
             if (hasUpgrade('h', 21)) effect = effect.pow(upgradeEffect('h', 21))
+            if (hasUpgrade('br', 13)) effect = effect.times(upgradeEffect('br', 13))
             return effect
         },
     },
@@ -175,7 +188,7 @@ addLayer("g", {
         },
         12: {
             title: "I need More!",
-            description: "The Generator Power cap is expanded based on your Generator Points.",
+            description: "The Generator Power cap is expanded based on your Generators.",
             cost: new Decimal(7),
             effect() {
                 let power = new Decimal(1.22).pow(player.g.points)
@@ -280,6 +293,12 @@ addLayer("g", {
         player[this.layer].upgrades.push(...keptUpgrades);
         if (!hasMilestone('h', 3)) player.g.buyableAuto = false
         if (!hasMilestone('h', 3)) player.g.auto = false
+        player.h.time = new Decimal(0)
+        player.g.power = new Decimal(0)
+        player.br.level = new Decimal(0)
+        player.br.exp = new Decimal(0)
+        player.br.exptotal = new Decimal(0)
+        player.br.buff = new Decimal(0)
     },
     automate(){
         if (player.g.buyableAuto && hasMilestone("h", 3)) {

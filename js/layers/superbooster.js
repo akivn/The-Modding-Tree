@@ -3,6 +3,17 @@ addLayer("sb", {
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
+    nodeStyle() {
+        return options.imageNode ? {
+            'color': 'white',
+            'background-image': 'url("resources/superbooster.png")',
+            'background-position': 'center center',
+            'background-size': '108%',
+            'border': '1px solid white'
+        } : {
+            'background-image': 'radial-gradient(circle at center, #a090e0, #504870)'
+        }
+    },
     name: "Super Boosters",
     symbol: "SB",
     color: "#a090e0",                       // The color for this layer, which affects many elements.
@@ -40,6 +51,7 @@ addLayer("sb", {
     },
     effect() {
         let effect = new Decimal(0.25).times(player.sb.points)
+        if (player.br.buff.gte(3)) effect = effect.times(tmp.br.effect3)
         return effect
     },
     effectDescription(){
@@ -55,6 +67,12 @@ addLayer("sb", {
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true},
+        },
+        12: {
+            title: "ミキ+: Another Update",
+            description: "Unlock Row 3 of Art Upgrades.",
+            cost: new Decimal(4),
             unlocked(){ return true},
         },
     },

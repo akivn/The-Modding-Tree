@@ -6,7 +6,19 @@ addLayer("h", {
     startData() { return {
         unlocked: false,
         points: new Decimal(0),
+        time: new Decimal(0),
     }},
+    nodeStyle() {
+        return options.imageNode ? {
+            'color': 'white',
+            'background-image': 'url("resources/honour.png")',
+            'background-position': 'center center',
+            'background-size': '108%',
+            'border': '1px solid white'
+        } : {
+            'background-image': 'radial-gradient(circle at center, #E0B024, #705812)'
+        }
+    },
     color: "#E0B024",
     requires: new Decimal(1e50), // Can be a function that takes requirement increases into account
     resource: "Honours", // Name of prestige currency
@@ -24,6 +36,7 @@ addLayer("h", {
     },
     directMult() { // Use here instead if you want to directly boost after exponent
         mult = new Decimal(1)
+        if (player.br.buff.gte(4)) mult = mult.times(tmp.br.effect4)
         return mult
     },
     effect() {
@@ -48,6 +61,9 @@ addLayer("h", {
         return `boosting Art Progress by x${format(tmp[this.layer].effect)} and Generator Power gain by x${format(tmp[this.layer].effect2)}`     
     },
     autoUpgrade: true,
+    update(delta) {
+        player.h.time = player.h.time.add(Decimal.times(new Decimal(1), delta))
+    },
     upgrades: {
         11: {
             fullDisplay() {
@@ -116,7 +132,8 @@ addLayer("h", {
         14: {
             fullDisplay() {
                 let d1 = `<h2>Honour Yoshino Himekawa</h2><br>`
-                if (hasUpgrade('h', 14)) return (d1 + `Nerfs the softcap for Artspace boost to Art after 1e6 based on your Honours.<br>Requires 1e86 Art Points to unlock.<br>Current Boost: Power ${format(upgradeEffect('h', 14), 4)} from 0.625`)
+                if (hasUpgrade('h', 14) && hasUpgrade('br', 11)) return (d1 + `Nerfs the softcap for Artspace boost to Art after 1e6x based on your Honours.<br>Requires 1e86 Art Points to unlock.<br>Refer to 'Amulet Heart' for Boost effect.`)
+                else if (hasUpgrade('h', 14)) return (d1 + `Nerfs the softcap for Artspace boost to Art after 1e6x based on your Honours.<br>Requires 1e86 Art Points to unlock.<br>Current Boost: Power ${format(upgradeEffect('h', 14), 4)} from 0.625`)
                 else return (d1 + `Nerfs the softcap for Artspace boost to Art after 1e6 based on your Honours.<br>Requires 1e86 Art Points to unlock.`)
             },
             cost: new Decimal(1e86),
@@ -177,19 +194,37 @@ addLayer("h", {
         23: {
             fullDisplay() {
                 let d1 = `<h2>Honour Yua Sakurai</h2><br>`
-                if (hasUpgrade('h', 23)) return (d1 + `All Art Dimensions are stronger based on your Experience.<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
-                else return (d1 + `All Art Dimensions are stronger based on your Experience.<br>Requires 1e130 Art Points to unlock.`)
+                let cap = new Decimal(10)
+                if (hasUpgrade('h', 23)) return (d1 + `All Art Dimensions are stronger based on time since Honour Reset (Caps at ${format(cap)}x).<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
+                else return (d1 + `All Art Dimensions are stronger based on time since Honour Reset (Caps at ${format(cap)}x).<br>Requires 1e130 Art Points to unlock.`)
             },
             cost: new Decimal(1e130),
             currencyInternalName: "points",
             currencyLayer: 'a',
             effect() {
-                let power = player.points.add(10).log(10).times(2).add(1).pow(1.2)
-                if (power.lte(1)) power = new Decimal(1)
+                let power = player.h.time.add(1).pow(0.667)
+                if (power.gte(10)) power = new Decimal(10)
                 return power
             },
             canAfford() {
                 return player.a.points.gte(1e130)
+            },
+            pay() {
+                return
+            },
+            unlocked(){ return player.h.unlocked },
+        },
+        24: {
+            fullDisplay() {
+                let d1 = `<h2>Honour Amu Hinamori</h2><br>`
+                if (hasUpgrade('h', 23)) return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough, and Honour Rem is 1.2x stronger.<br>Requires 1e154 Art Points to unlock.`)
+                else return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough, and Honour Rem is 1.2x stronger.<br>Requires 1e154 Art Points to unlock.`)
+            },
+            cost: new Decimal(1e154),
+            currencyInternalName: "points",
+            currencyLayer: 'a',
+            canAfford() {
+                return player.a.points.gte(1e154)
             },
             pay() {
                 return
@@ -242,6 +277,10 @@ addLayer("h", {
             done() {return player[this.layer].best.gte(1e8)}, // Used to determine when to give the milestone
             effectDescription: "Unlock Art Dimension 7 and It's Autobuyer.",
         },
+        8: {requirementDescription: "1e11 Honours",
+            done() {return player[this.layer].best.gte(1e11)}, // Used to determine when to give the milestone
+            effectDescription: "Unlock Art Dimension 8 and It's Autobuyer.",
+        },
     },
     tabFormat: {
         "Main": {
@@ -267,6 +306,22 @@ addLayer("h", {
                 "milestones"
             ],
         },
+    },
+    doReset(prestige) {
+        // Stage 1, almost always needed, makes resetting this layer not delete your progress
+        if (layers[prestige].row <= this.row) return ;
+    
+        // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
+        let keptUpgrades = [];
+    
+        // Stage 3, track which main features you want to keep - milestones
+        let keep = [];
+    
+        // Stage 4, do the actual data reset
+        layerDataReset(this.layer, keep);
+    
+        // Stage 5, add back in the specific subfeatures you saved earlier
+        player[this.layer].upgrades.push(...keptUpgrades);
     },
     layerShown() {return hasUpgrade('a', 24) || player[this.layer].unlocked}
     }

@@ -1,9 +1,9 @@
 let modInfo = {
 	name: "The Art Tree Rewritten",
-	id: "art2",
+	id: "mikiart2",
 	author: "akivn",
 	pointsName: "Experience",
-	modFiles: ["layers/art.js", "layers/superbooster.js", "layers/honour.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
+	modFiles: ["layers/art.js", "layers/breakthrough.js", "layers/infinity.js", "layers/misc/crunch.js", "layers/superbooster.js", "layers/honour.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -20,7 +20,7 @@ let VERSION = {
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.0</h3><br>
 		- Added things.<br>
-		- Added stuff.`
+		- a`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -44,6 +44,7 @@ function getPointGen() {
 	if (hasUpgrade('g', 11)) gain = gain.times(upgradeEffect('g', 11))
 	if (hasUpgrade('g', 14)) gain = gain.times(upgradeEffect('g', 14))
 	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
+	if (hasUpgrade('a', 31)) gain = gain.times(upgradeEffect('a', 31))
 	gain = gain.times(tmp.b.effect)
 	gain = gain.times(tmp.ac.effect)
 	if (hasAchievement('ac', 15)) gain = gain.times(achievementEffect('ac', 15))
@@ -60,13 +61,16 @@ var displayThings = [
 		return `Current Art: ${format(player.a.points)}`
 	},
 	function() {
-		if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).floor()))} Arts per second`
+		if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2).floor()))} Arts per second`
+	},
+	function() {
+		if (player.a.points.gte(1e281) && options.dandereMode) return `Jumpscare Incoming at 1.80e308 Arts!`
 	}
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.i.points.gte(1)
 }
 
 

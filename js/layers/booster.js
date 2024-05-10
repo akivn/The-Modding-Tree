@@ -9,6 +9,17 @@ addLayer("b", {
             else return true
         },
     }},
+    nodeStyle() {
+        return options.imageNode ? {
+            'color': 'white',
+            'background-image': 'url("resources/booster.png")',
+            'background-position': 'center center',
+            'background-size': '100%',
+            'border': '1px solid white'
+        } : {
+            'background-image': 'radial-gradient(circle at center, #6e64c4, #373262)'
+        }
+    },
     branches: ['g', 'h', 'sb'],
     color: "#6e64c4",                       // The color for this layer, which affects many elements.
     resource: "Boosters",            // The name of this layer's main prestige resource.
