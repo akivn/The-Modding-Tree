@@ -9,7 +9,7 @@ addLayer("b", {
             else return true
         },
     }},
-    branches: ['g', 'h'],
+    branches: ['g', 'h', 'sb'],
     color: "#6e64c4",                       // The color for this layer, which affects many elements.
     resource: "Boosters",            // The name of this layer's main prestige resource.
     row: 1,                                   // The row this layer is on (0 is the first row).
@@ -57,6 +57,7 @@ addLayer("b", {
     },
     effect() {
         let base = new Decimal(2)
+        base = base.add(tmp.sb.effect)
         if (hasAchievement('ac', 25)) base = base.add(achievementEffect('ac', 25))
         let effect = new Decimal(base).pow(player[this.layer].points)
         softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(10).add(1).pow(0.5)))

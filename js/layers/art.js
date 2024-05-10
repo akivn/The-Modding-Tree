@@ -120,6 +120,8 @@ addLayer("a", {
         player.a.buyables[103] = player.a.buyables[103].add(Decimal.times(tmp.a.buyables[104].effect, delta));
         player.a.buyables[104] = player.a.buyables[104].add(Decimal.times(tmp.a.buyables[105].effect, delta));
         player.a.buyables[105] = player.a.buyables[105].add(Decimal.times(tmp.a.buyables[106].effect, delta));
+        player.a.buyables[106] = player.a.buyables[106].add(Decimal.times(tmp.a.buyables[107].effect, delta));
+
     },
     buyables: {
         "expboost": {
@@ -161,7 +163,9 @@ addLayer("a", {
                 return cost 
             },
             effect(x){
-                let power = new Decimal(2).pow(x)
+                let base = new Decimal(2)
+                if (hasUpgrade('h', 22)) base = new Decimal(2.25)
+                let power = new Decimal(base).pow(x)
                 if (x.lte(0) && x.gte(0)) power = new Decimal(1)
                 return power
             },
@@ -199,6 +203,7 @@ addLayer("a", {
                 let power = new Decimal(2).pow(player.a.bought1)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('a', 24)) power = power.times(upgradeEffect('a', 24))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 if (hasAchievement('ac', 35)) power = power.times(1.2)
                 return power
             },
@@ -237,6 +242,7 @@ addLayer("a", {
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought2)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 return power
             },
             effect(x){
@@ -270,6 +276,7 @@ addLayer("a", {
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought3)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 return power
             },
             effect(x){
@@ -304,6 +311,7 @@ addLayer("a", {
                 let power = new Decimal(2).pow(player.a.bought4)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 12)) power = power.times(upgradeEffect('h', 12))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 return power
             },
             effect(x){
@@ -337,6 +345,7 @@ addLayer("a", {
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought5)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 return power
             },
             effect(x){
@@ -364,13 +373,14 @@ addLayer("a", {
             title: "Art Dimension 6",
             cost() { 
                 let base = new Decimal(1e13)
-                let cost = new Decimal(base).pow(player.a.bought6).times(1e78)
+                let cost = new Decimal(base).pow(player.a.bought6).times(1e104)
                 cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(2).log(2).minus(512).div(512).minus(1)).pow(0.1))
                 return cost 
             },
             effect2(){
                 let power = new Decimal(2).pow(player.a.bought6)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 return power
             },
             effect(x){
@@ -392,10 +402,45 @@ addLayer("a", {
             style() {
                 return {height: '66px', width: '200px'}
             },
-            unlocked() {return false} 
+            unlocked() {return hasMilestone('h', 6)} 
         },
-
+        107: {
+            title: "Art Dimension 7",
+            cost() { 
+                let base = new Decimal(1e15)
+                let cost = new Decimal(base).pow(player.a.bought7).times(1e128)
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(2).log(2).minus(512).div(512).minus(1)).pow(0.1))
+                return cost 
+            },
+            effect2(){
+                let power = new Decimal(2).pow(player.a.bought7)
+                if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
+                if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " Arts"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.a.bought7, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.a.points.gte(this.cost()) },
+            buy() {
+                player.a.points = player.a.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.a.bought7 = player.a.bought7.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            },
+            unlocked() {return hasMilestone('h', 7)} 
+        },
     },
+    
     upgrades:{
         11: {
             title: "Motivation",
@@ -424,7 +469,7 @@ addLayer("a", {
             description: "Art gain per Artwork is boosted based on the Art Size.",
             cost: new Decimal(250),
             effect() {
-                let power = new Decimal(tmp.a.bars.Art.req.log(10).pow(1.3))
+                let power = new Decimal(tmp.a.bars.Art.req.add(10).log(10).pow(1.3))
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -488,7 +533,6 @@ addLayer("a", {
                 let req = new Decimal(10)
                 req = req.times(tmp.a.buyables["enlarge"].effect)
                 if (hasUpgrade('a', 12)) req = req.times(upgradeEffect('a', 12))
-                if (hasUpgrade('a', 22)) req = req.times(upgradeEffect('a', 22))
                 if (hasUpgrade('g', 11)) req = req.times(upgradeEffect('g', 11))
                 return req
             },
@@ -559,6 +603,7 @@ addLayer("a", {
                 ["buyable", 104],
                 ["buyable", 105],
                 ["buyable", 106],
+                ["buyable", 107],
             ],
             unlocked() {return hasUpgrade('g', 13)}
         },
@@ -597,6 +642,7 @@ addLayer("a", {
                 buyBuyable('a', 104)
                 if (tmp.a.buyables[105].unlocked) buyBuyable('a', 105)
                 if (tmp.a.buyables[106].unlocked) buyBuyable('a', 106)
+                if (tmp.a.buyables[107].unlocked) buyBuyable('a', 107)
             }
         }
         if (player.a.buyableAuto && hasMilestone("b", 2)) {

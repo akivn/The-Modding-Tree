@@ -28,7 +28,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.a.auto ? tmp.a.color : "#666666"
+                    return (player.a.auto && hasMilestone("b", 0)) ? tmp.a.color : "#666666"
                 }
             },
         },
@@ -48,7 +48,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.a.buyableAuto ? tmp.a.color : "#666666"
+                    return (player.a.buyableAuto && hasMilestone("b", 2)) ? tmp.a.color : "#666666"
                 }
             },
         },
@@ -68,7 +68,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.a.dimAuto ? tmp.a.color : "#666666"
+                    return (player.a.dimAuto && hasMilestone("h", 1)) ? tmp.a.color : "#666666"
                 }
             },
         },
@@ -88,7 +88,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.b.auto ? tmp.b.color : "#666666"
+                    return (player.b.auto && hasMilestone("h", 3)) ? tmp.b.color : "#666666"
                 }
             },
         },
@@ -108,7 +108,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.g.auto ? tmp.g.color : "#666666"
+                    return (player.g.auto && hasMilestone("h", 3)) ? tmp.g.color : "#666666"
                 }
             },
         },
@@ -128,7 +128,7 @@ addLayer("ab", {
             },
             style: {
                 "background-color"() {
-                    return player.g.buyableAuto ? tmp.g.color : "#666666"
+                    return (player.g.buyableAuto && hasMilestone("h", 3)) ? tmp.g.color : "#666666"
                 }
             },
         },

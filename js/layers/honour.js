@@ -28,14 +28,20 @@ addLayer("h", {
     },
     effect() {
         let basepow = new Decimal(2.75)
+        let base = new Decimal(0.55)
+        if (hasMilestone('h', 6)) base = new Decimal(0.45)
         let effect = player[this.layer].points.add(1).pow(basepow)
-        effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(8).add(1).pow(0.55)))
+        effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(8).add(1).pow(base)))
+        if (hasUpgrade('sb', 11)) effect = effect.times(upgradeEffect('sb', 11))
         return effect
     },
     effect2() {
         let basepow = new Decimal(1.5)
+        let base = new Decimal(0.125)
+        if (hasMilestone('h', 6)) base = new Decimal(0.1125)
         let effect = player[this.layer].points.add(1).pow(basepow)
-        effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(24).add(1).pow(0.125)))
+        effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(24).add(1).pow(base)))
+        if (hasUpgrade('sb', 11)) effect = effect.times(upgradeEffect('sb', 11))
         return effect
     },
     effectDescription(){
@@ -117,12 +123,73 @@ addLayer("h", {
             currencyInternalName: "points",
             currencyLayer: 'a',
             effect() {
-                let power = new Decimal(0.125).add(new Decimal(0.5).pow(player.h.points.add(10).log(10).div(12).add(1)))
+                let power = new Decimal(0.125).add(new Decimal(0.5).pow(player.h.points.add(10).log(10).div(18).add(1).pow(0.675)))
                 if (power.lte(0.125)) power = new Decimal(0.125)
                 return power
             },
             canAfford() {
                 return player.a.points.gte(1e86)
+            },
+            pay() {
+                return
+            },
+            unlocked(){ return player.h.unlocked },
+        },
+        21: {
+            fullDisplay() {
+                let d1 = `<h2>Honour Haruno Takaragi</h2><br>`
+                if (hasUpgrade('h', 21)) return (d1 + `Generator Cap is increased based on your Experience.<br>Requires 1e102 Art Points to unlock.<br>Current Boost: ^${format(upgradeEffect('h', 21), 4)}`)
+                else return (d1 + `Generator Cap is increased based on your Experience.<br>Requires 1e102 Art Points to unlock.`)
+            },
+            cost: new Decimal(1e102),
+            currencyInternalName: "points",
+            currencyLayer: 'a',
+            effect() {
+                let power = player.points.add(10).log(10).div(1000).add(1)
+                if (power.lte(1)) power = new Decimal(1)
+                return power
+            },
+            canAfford() {
+                return player.a.points.gte(1e102)
+            },
+            pay() {
+                return
+            },
+            unlocked(){ return player.h.unlocked },
+        },
+        22: {
+            fullDisplay() {
+                let d1 = `<h2>Honour Kotori Itsuka</h2><br>`
+                if (hasUpgrade('h', 22)) return (d1 + `Unlock Super-boosters, and the base of 'Art Amplifier' is raised to 2.25x.<br>Requires 1e112 Art Points to unlock.`)
+                else return (d1 + `Unlock Super-boosters, and the base of 'Art Amplifier' is raised to 2.25x.<br>Requires 1e112 Art Points to unlock.`)
+            },
+            cost: new Decimal(1e112),
+            currencyInternalName: "points",
+            currencyLayer: 'a',
+            canAfford() {
+                return player.a.points.gte(1e112)
+            },
+            pay() {
+                return
+            },
+            unlocked(){ return player.h.unlocked },
+        },
+        23: {
+            fullDisplay() {
+                let d1 = `<h2>Honour Yua Sakurai</h2><br>`
+                if (hasUpgrade('h', 23)) return (d1 + `All Art Dimensions are stronger based on your Experience.<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
+                else return (d1 + `All Art Dimensions are stronger based on your Experience.<br>Requires 1e130 Art Points to unlock.`)
+            },
+            cost: new Decimal(1e130),
+            currencyInternalName: "points",
+            currencyLayer: 'a',
+            effect() {
+                let power = player.points.add(10).log(10).times(2).add(1).pow(1.2)
+                if (power.lte(1)) power = new Decimal(1)
+                return power
+            },
+            canAfford() {
+                return player.a.points.gte(1e130)
             },
             pay() {
                 return
@@ -163,9 +230,17 @@ addLayer("h", {
             done() {return player[this.layer].best.gte(500)}, // Used to determine when to give the milestone
             effectDescription: "Unlock Art Dimension 5 and It's Autobuyer.",
         },
-        5: {requirementDescription: "1000 Honours",
+        5: {requirementDescription: "1,000 Honours",
             done() {return player[this.layer].best.gte(1000)}, // Used to determine when to give the milestone
             effectDescription: "Boosters and Generators reset nothing.",
+        },
+        6: {requirementDescription: "1,000,000 Honours",
+            done() {return player[this.layer].best.gte(1e6)}, // Used to determine when to give the milestone
+            effectDescription: "Unlock Art Dimension 6 and It's Autobuyer, and weaken the softcap of Honour's effect.",
+        },
+        7: {requirementDescription: "100,000,000 Honours",
+            done() {return player[this.layer].best.gte(1e8)}, // Used to determine when to give the milestone
+            effectDescription: "Unlock Art Dimension 7 and It's Autobuyer.",
         },
     },
     tabFormat: {
@@ -176,6 +251,9 @@ addLayer("h", {
                 "blank",
                 ['display-text', function() {
                     return `<h2>Honours</h2>` }, { 'font-size': '15px', 'color': 'silver'}
+                ],
+                ['display-text', function() {
+                    return `You permanently keep a honour upon unlocking them.` }, { 'font-size': '15px', 'color': 'silver'}
                 ],
                 "blank",
                 "upgrades"

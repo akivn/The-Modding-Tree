@@ -86,6 +86,7 @@ addLayer("g", {
             let effect = new Decimal(50)
             if (getBuyableAmount('g', "limitup").gt(0)) effect = effect.times(tmp.g.buyables["limitup"].effect)
             if (hasUpgrade('g', 12)) effect = effect.times(upgradeEffect('g', 12))
+            if (hasUpgrade('h', 21)) effect = effect.pow(upgradeEffect('h', 21))
             return effect
         },
     },
