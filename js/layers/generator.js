@@ -5,6 +5,14 @@ addLayer("g", {
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
         power: new Decimal(0),
+        auto() {
+            if (!player.g.auto) return false
+            else return true
+        },
+        buyableAuto() {
+            if (!player.g.buyableAuto) return false
+            else return true
+        },
     }},
     branches: [],
     color: "#80ff80",                       // The color for this layer, which affects many elements.
@@ -18,6 +26,12 @@ addLayer("g", {
     requires: new Decimal(1e11),              // The amount of the base needed to  gain 1 of the prestige currency.
     base () {
         return new Decimal(3)
+    },
+    canBuyMax() {
+        return hasMilestone('h', 2)
+    },
+    autoPrestige() {
+        return (hasMilestone('h', 3) && player.g.auto)
     },
     
 
@@ -45,6 +59,9 @@ addLayer("g", {
     layerShown() { return hasUpgrade('b', 14) || player[this.layer].unlocked }, 
     passiveGeneration() {
     },
+    resetsNothing() {
+        return hasMilestone('h', 5)
+    },
     power: {
         effect() {
             let a = tmp.g.buyables["effectup"].effect
@@ -52,10 +69,14 @@ addLayer("g", {
             return effect
         },
         perSecond() {
-            let effect = new Decimal(2).pow(player.g.points)
+            let base = new Decimal(2)
+            if (hasUpgrade('a', 23)) base = base.add(upgradeEffect('a', 23))
+            let effect = new Decimal(base).pow(player.g.points)
             if (hasMilestone('g', 0)) effect = effect.times(3)
             if (player.g.points.lte(0)) effect = new Decimal(0)
             if (hasUpgrade('b', 22)) effect = effect.times(upgradeEffect('b', 22))
+            effect = effect.times(tmp.h.effect2)
+            if (hasAchievement('ac', 41)) effect = effect.add(tmp.g.limit.effect.minus(player.g.power).times(0.01))
             if (player.g.power.gte(tmp.g.limit.effect)) effect = new Decimal(0)
             return effect
         },
@@ -119,6 +140,7 @@ addLayer("g", {
             },
             effect(x){
                 let power = new Decimal(1).add(x.times(0.3)).pow(0.7)
+                if (hasUpgrade('a', 22)) power = new Decimal(1).add(x.times(0.36)).pow(0.73)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
@@ -247,11 +269,23 @@ addLayer("g", {
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
+        if (hasMilestone('h', 1)) keep.push("milestones")
+        if (hasMilestone('h', 3)) keep.push("upgrades")
     
         // Stage 4, do the actual data reset
         layerDataReset(this.layer, keep);
     
         // Stage 5, add back in the specific subfeatures you saved earlier
         player[this.layer].upgrades.push(...keptUpgrades);
+        if (!hasMilestone('h', 3)) player.g.buyableAuto = false
+        if (!hasMilestone('h', 3)) player.g.auto = false
+    },
+    automate(){
+        if (player.g.buyableAuto && hasMilestone("h", 3)) {
+            for(i=1;i<101;i++){
+                buyBuyable("g", "limitup")
+                buyBuyable("g", "effectup")
+            }
+        };
     },
 })

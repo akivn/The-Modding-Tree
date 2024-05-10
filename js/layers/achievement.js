@@ -122,6 +122,52 @@ addLayer("ac", {
                 player[this.layer].points = player[this.layer].points.add(1)
             }
         },
+        32: {
+            name: "100 Artspace is really a lot",
+            tooltip: "Create 100 artspace.",
+            done() { return player.a.artspace.gte(100) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        33: {
+            name: "Maybe a Trillion?",
+            tooltip: "Have 1e12 Generator Power.",
+            done() { return player.g.power.gte(1e12) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        34: {
+            name: "Where's the Dimension Shift?",
+            tooltip: "Have 2 Art Dimension 4.",
+            done() { return getBuyableAmount('a', 104).gte(2) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        35: {
+            name: "Slow Turtle",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Have your Artwork/sec below 1 while having over 1e10 Artwork Progress/sec. Reward: Artspace Production is 1.2x stronger.`
+                else return `Have your Artwork/sec below 1 while having over 1e10 Artwork Progress/sec. Reward: Artspace Production is 1.2x stronger.`
+            },
+            done() { return tmp.a.artworkPerSecond.perSecond.lte(1) && tmp.a.art.perSecond.gte(1e10) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        41: {
+            name: "Honourize!",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Unlock Honour. Reward: Gain 1% of your remaining available Generator Power every second.`
+                else return `Unlock Honour. Reward: Gain 1% of your remaining available Generator Power every second.`
+            },
+            done() { return player.h.unlocked },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
         
         
     } 

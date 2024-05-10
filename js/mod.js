@@ -3,7 +3,7 @@ let modInfo = {
 	id: "art2",
 	author: "akivn",
 	pointsName: "Experience",
-	modFiles: ["layers/art.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
+	modFiles: ["layers/art.js", "layers/honour.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -41,11 +41,12 @@ function canGenPoints(){
 function getPointGen() {
 	let gain = new Decimal(0)
 	if (player.a.progress) gain = new Decimal(tmp.a.art.perSecond)
+	if (hasUpgrade('g', 11)) gain = gain.times(upgradeEffect('g', 11))
+	if (hasUpgrade('g', 14)) gain = gain.times(upgradeEffect('g', 14))
+	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
 	gain = gain.times(tmp.b.effect)
 	gain = gain.times(tmp.ac.effect)
 	if (hasAchievement('ac', 15)) gain = gain.times(achievementEffect('ac', 15))
-	if (hasUpgrade('g', 11)) gain = gain.times(upgradeEffect('g', 11))
-	if (hasUpgrade('g', 14)) gain = gain.times(upgradeEffect('g', 14))
 	return gain
 }
 
@@ -56,7 +57,10 @@ function addedPlayerData() { return {
 // Display extra things at the top of the page
 var displayThings = [
 	function() {
-		return
+		return `Current Art: ${format(player.a.points)}`
+	},
+	function() {
+		if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).floor()))} Arts per second`
 	}
 ]
 
