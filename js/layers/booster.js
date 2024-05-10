@@ -156,6 +156,12 @@ addLayer("b", {
             cost: new Decimal(19),
             unlocked(){ return hasUpgrade('b', 14) },
         },
+        24: {
+            title: "Powerup Tools",
+            description: "Unlock 4 more Art Upgrades",
+            cost: new Decimal(20),
+            unlocked(){ return hasUpgrade('b', 14) },
+        },
     },
     tabFormat: {
         "Main": {

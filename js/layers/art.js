@@ -8,11 +8,11 @@ addLayer("a", {
         art: new Decimal(0),
         totalArt: new Decimal(0),
         auto() {
-            if (!player.a.auto) return false
+            if (!player.a.auto || !hasMilestone('b', 0)) return false
             else return true
         },
         buyableAuto() {
-            if (!player.a.buyableAuto) return false
+            if (!player.a.buyableAuto || !hasMilestone('b', 2)) return false
             else return true
         },
         dimAuto() {
@@ -30,6 +30,8 @@ addLayer("a", {
         bought6: new Decimal(0),
         bought7: new Decimal(0),
         bought8: new Decimal(0),
+        dimshift: new Decimal(0),
+        dimboost: new Decimal(0),
     }},
     branches: ['b', 'g', 'h'],
     color: "#20A0D4",
@@ -61,6 +63,7 @@ addLayer("a", {
     exp(){
         let exp = new Decimal(1)
         if (hasUpgrade('b', 21)) exp = exp.times(1.2)
+        if (hasUpgrade('a', 22)) exp = exp.times(1.05)
         return exp
     },
     art: {
@@ -197,6 +200,10 @@ addLayer("a", {
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('a', 24)) power = power.times(upgradeEffect('a', 24))
                 if (hasAchievement('ac', 35)) power = power.times(1.2)
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
                 return power
             },
             effect(x){
@@ -481,6 +488,7 @@ addLayer("a", {
                 let req = new Decimal(10)
                 req = req.times(tmp.a.buyables["enlarge"].effect)
                 if (hasUpgrade('a', 12)) req = req.times(upgradeEffect('a', 12))
+                if (hasUpgrade('a', 22)) req = req.times(upgradeEffect('a', 22))
                 if (hasUpgrade('g', 11)) req = req.times(upgradeEffect('g', 11))
                 return req
             },
