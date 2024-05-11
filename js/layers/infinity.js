@@ -86,11 +86,27 @@ addLayer("i", {
             currencyLayer: "i",
             unlocked(){ return true},
         },
+        31: {
+            title: "Infinity Stackup",
+            description: "Boost Art progress based on your Infinities",
+            canAfford() {return (hasUpgrade('i', 21) || hasUpgrade('i', 22)) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(3),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            effect() {
+                let power = player.i.infinities.times(3).add(1)
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true},
+            branches: [21, 22]
+        },
     },
     buyables: {
         11: {
             cost() { return new Decimal(5.6438030941e102).pow(getBuyableAmount(this.layer, this.id).add(0.5)) },
-            canAfford() { return player.points.gte(this.cost()) },
+            canAfford() { return player.a.points.gte(this.cost()) },
             display() { return `Get a Study from your Art amount.<br>Next at ${formatWhole(tmp.i.buyables[11].cost)} Arts` },
             buy() { player.i.studyPoints = player.i.studyPoints.plus(1); player.a.points = player.a.points.minus(this.cost()); setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).plus(1)) },
             style() { return { height: '60px' } }
@@ -174,7 +190,7 @@ addLayer("i", {
             ["clickable", 'respecOnNextInfinity'],
             "blank",
             ["upgrade-tree",
-                [[11], [21,22]]
+                [[11], [21,22], [31]]
             ]
         ],
     },},

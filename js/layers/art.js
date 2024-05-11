@@ -92,6 +92,7 @@ addLayer("a", {
             perSecond = perSecond.times(tmp.a.buyables["expboost"].effect)
             if (hasUpgrade('a', 11)) perSecond = perSecond.times(upgradeEffect('a', 11))
             if (hasUpgrade('b', 11)) perSecond = perSecond.times(upgradeEffect('b', 11))
+            if (hasUpgrade('i', 31)) perSecond = perSecond.times(upgradeEffect('i', 31))
             if (hasMilestone('b', 1)) perSecond = perSecond.times(4)
             perSecond = perSecond.times(tmp.g.power.effect)
             perSecond = perSecond.times(tmp.h.effect)
@@ -771,7 +772,7 @@ addLayer("a", {
         if (!hasMilestone('h', 1)) player.a.dimAuto = false
     },
     automate() {
-        if (hasMilestone('h', 1) && player.a.dimAuto) {
+        if (hasMilestone('h', 1) && player.a.dimAuto && hasUpgrade('g', 13)) {
             for (i=1;i<101;i++) {
                 buyBuyable('a', 101)
                 buyBuyable('a', 102)

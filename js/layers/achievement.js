@@ -275,8 +275,8 @@ addLayer("ac", {
         55: {
             name: "All Shugo Charas are with you.",
             tooltip() {
-                if (hasAchievement(this.layer, this.id)) return `Get all 3 Amulet upgrades.`
-                else return `Get all 3 Amulet upgrades.`
+                if (hasAchievement(this.layer, this.id)) return `Get 3 Amulet upgrades.`
+                else return `Get 3 Amulet upgrades.`
             },
             done() { return hasUpgrade('br', 11) && hasUpgrade('br', 12) && hasUpgrade('br', 13)},
             onComplete() {
