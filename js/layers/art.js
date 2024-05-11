@@ -145,7 +145,7 @@ addLayer("a", {
         player.a.buyables[107] = player.a.buyables[107].add(Decimal.times(tmp.a.buyables[108].effect, delta));
         if (!hasMilestone('b', 0)) player.a.auto = false
         if (!hasMilestone('b', 2)) player.a.buyableAuto = false
-        if (!hasMilestone('h', 1)) player.a.buyableAuto = false
+        if (!hasMilestone('h', 1)) player.a.dimAuto = false
         if (!hasMilestone("h", 3)) player.b.auto = false
         if (!hasMilestone("h", 3)) player.g.auto = false
         if (!hasMilestone("h", 3)) player.g.buyableAuto = false
