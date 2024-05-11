@@ -68,7 +68,7 @@ addLayer("i", {
         },
         21: {
             title: "Doubling Clover",
-            description: "'Effect Increaser' is now raised to ^1.2.",
+            description: "'Effect Increaser' is now 1.2x more effective.",
             cost: new Decimal(1),
             currencyDisplayName: "Study",
             currencyInternalName: "studyPoints",

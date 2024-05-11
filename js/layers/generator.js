@@ -156,6 +156,7 @@ addLayer("g", {
             effect(x){
                 let power = new Decimal(1).add(x.times(0.3)).pow(0.7)
                 if (hasUpgrade('a', 22)) power = new Decimal(1).add(x.times(0.36)).pow(0.73)
+                if (hasUpgrade('i', 21)) power = power.times(1.2)
                 return power
             },
             display() { let data = tmp[this.layer].buyables[this.id]
