@@ -81,6 +81,9 @@ addLayer("a", {
     multi2() {
         let multi = new Decimal(1)
         if (player.br.buff.gte(2)) multi = multi.times(tmp.br.effect2)
+        if (hasUpgrade('i', 11)) multi = multi.times(upgradeEffect('i', 11))
+        if (hasAchievement('ac', 61)) multi = multi.times(2)
+        multi = multi.times(tmp.ac.effect2)
         return multi
     },
     art: {
@@ -154,6 +157,7 @@ addLayer("a", {
                 let power = new Decimal(x.pow(0.7)).times(player.points.add(10).log(10).pow(1.5))
                 let base = new Decimal(1.6)
                 if (hasUpgrade('h', 11)) base = base.add(upgradeEffect('h', 11))
+                if (hasAchievement('ac', 43)) base = base.add(0.001)
                 if (hasUpgrade('b', 12)) power = new Decimal(base).pow(x).times(player.points.add(10).log(10))
                 if (hasUpgrade('b', 12)) power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(10).add(1).pow(0.15)))  
                 if (x.lte(0) && x.gte(0)) power = new Decimal(1)
@@ -219,11 +223,14 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought1)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought1)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('a', 24)) power = power.times(upgradeEffect('a', 24))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 if (hasAchievement('ac', 35)) power = power.times(1.2)
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -259,9 +266,12 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought2)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought2)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -293,9 +303,12 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought3)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought3)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -327,10 +340,13 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought4)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought4)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 12)) power = power.times(upgradeEffect('h', 12))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -362,9 +378,12 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought5)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought5)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -397,9 +416,13 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought6)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought6)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 54)) power = power.times(achievementEffect('ac', 54))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -432,9 +455,12 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought7)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought7)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){
@@ -467,9 +493,12 @@ addLayer("a", {
                 return cost 
             },
             effect2(){
-                let power = new Decimal(2).pow(player.a.bought8)
+                let base = new Decimal(2)
+                if (hasUpgrade('i', 22)) base = new Decimal(2.2)
+                let power = new Decimal(base).pow(player.a.bought8)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
             effect(x){

@@ -32,7 +32,7 @@ addLayer("sb", {
     base: 1.1,  
     hotkeys: [
         {
-            key: "shift+b", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" for holding down ctrl.
+            key: "B", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" for holding down ctrl.
             description: "shift+B: reset your Boosters for Super-Boosters", // The description of the hotkey that is displayed in the game's How To Play tab
             onPress() { if (player.sb.unlocked) doReset("sb") }, // Determines if you can use the hotkey, optional
         }

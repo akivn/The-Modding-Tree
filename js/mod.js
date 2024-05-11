@@ -65,8 +65,8 @@ var displayThings = [
 		if (player.a.bulk) return `You are gaining ${format(tmp.a.artworkPerSecond.perSecond.times(tmp.a.multi.pow(tmp.a.exp).times(tmp.a.multi2).floor()))} Arts per second`
 	},
 	function() {
-		if (player.a.points.gte(1e281) && options.dandereMode) return `Jumpscare Incoming at 1.80e308 Arts!`
-	}
+		if (player.a.points.gte(1e281) && options.dandereMode && player.i.infinities.lt(1)) return `Jumpscare Incoming at 1.80e308 Arts!`
+	},
 ]
 
 // Determines when the game "ends"

@@ -14,6 +14,18 @@ addLayer("ac", {
         let effect = new Decimal(1.025).pow(player[this.layer].points)
         return effect
     },
+    effect2() {
+        let completedRows = new Decimal(0)
+        for(i=1;i<7;i++){ //rows
+            for(v=1;v<6;v++){ //columns
+                let completed = true
+                if (!hasAchievement(this.layer, i*10+v)) completed = false
+                if (completed && v==5) completedRows = completedRows.add(1)
+            }
+        }
+        effect = new Decimal(1.1).pow(completedRows)
+        return effect
+    },
     effectDescription(){
         return "boosting Experience gain by x" + format(tmp[this.layer].effect)      
     },                                           
@@ -168,8 +180,134 @@ addLayer("ac", {
                 player[this.layer].points = player[this.layer].points.add(1)
             }
         },
+        42: {
+            name: "Greet from your maid",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Unlock an Honour perk.`
+                else return `Unlock an Honour perk.`
+            },
+            done() { return hasUpgrade('h', 11) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        43: {
+            name: "Miki is getting tired",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get 1e100 Art. Reward: A slight boost of +0.003 base mulltiplier on 'Experience Boost'.`
+                else return `Get 1e100 Art. Reward: A slight boost of +0.001 base mulltiplier on 'Experience Boost'.`
+            },
+            done() { return player.a.points.gte(1e100) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        44: {
+            name: "Faster than a Potato",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get 1e29 artspace per second.`
+                else return `Get 1e29 artspace per second.`
+            },
+            done() { return tmp.a.artspace.perSecond.gte(1e29) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        45: {
+            name: "You don't need it anyway",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get 1e50 Arts without Boosters/Generators. Reward: Honour boosts are powered to ^1.005.`
+                else return `Get 1e50 Arts without Boosters/Generators. Reward: Honour boosts are powered to ^1.005.`
+            },
+            done() { return player.a.points.gte(1e50) && player.b.points.lte(0) && player.g.points.lte(0) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        51: {
+            name: "Anata ni Anrokku!",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Unlock Breakthrough.`
+                else return `Unlock Breakthrough.`
+            },
+            done() { return player.br.unlocked },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        52: {
+            name: "More experienced",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Reach Breakthrough Level 10.`
+                else return `Reach Breakthrough Level 10.`
+            },
+            done() { return player.br.level.gte(10) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        53: {
+            name: "90 degrees to Explosion",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get 2 Art Dimension 8s. Reward: Art Dimensions are 1% stronger.`
+                else return `Get 2 Art Dimension 8s. Reward: Art Dimensions are 1% stronger.`
+            },
+            done() { return player.a.buyables[108].gte(2) },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        54: {
+            name: "ERROR 666: DEVIL DOES NOT EXIST",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get 6.66e66x artwork expansion from Art Amplifier. Reward: Art Dimension 6 is stronger based on your Boosters. Currently: ${format(achievementEffect('ac', 54))}x`
+                else return `Get 6.66e66x artwork expansion from Art Amplifier. Reward: Art Dimension 6 is stronger based on your Boosters.`
+            },
+            done() { return buyableEffect('a', 'enlarge').gte(6.66e66) },
+            effect() {
+                let power = player.b.points.add(1).pow(0.25)
+                return power
+            },
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        55: {
+            name: "All Shugo Charas are with you.",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Get all 3 Amulet upgrades.`
+                else return `Get all 3 Amulet upgrades.`
+            },
+            done() { return hasUpgrade('br', 11) && hasUpgrade('br', 12) && hasUpgrade('br', 13)},
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
+        61: {
+            name: "Jumpscared, aren't you? Let's go Infinity!",
+            tooltip() {
+                if (hasAchievement(this.layer, this.id)) return `Big Crunch. Reward: x2 Art gain and divide Boosters/Generators cost by 10.`
+                else return `Big Crunch. Reward: x2 Art gain and divide Boosters/Generators cost by 10.`
+            },
+            done() { return player.i.infinities.gte(1)},
+            onComplete() {
+                player[this.layer].points = player[this.layer].points.add(1)
+            }
+        },
         
         
-    } 
+    },
+    tabFormat: {
+        "Upgrades": {
+        content: [
+            "main-display",
+            ['display-text', function() {
+                return `Every completed row also boosts Art gain by 1.1x, Currently: x${format(tmp.ac.effect2)}` }, { 'font-size': '15px', 'color': 'silver'}
+            ],
+            "blank",
+            "achievements",
+            ],
+        },
+    },
     
 })

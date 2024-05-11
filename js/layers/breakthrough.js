@@ -59,7 +59,19 @@ addLayer("br", {
         player.br.exp = player.br.exp.add(Decimal.times(tmp.br.perSecond, delta))
         player.br.exptotal = player.br.exptotal.add(Decimal.times(tmp.br.perSecond, delta))
         if (tmp[this.layer].bars.xpbar.progress>=1) {
-            player[this.layer].level = player[this.layer].level.add(1)
+            let target = new Decimal(0)
+            for (i=1;i<1001;i++) {
+                let a = player[this.layer].exp
+                let mult = new Decimal(0.01)
+                let req = new Decimal(15).times(new Decimal(1.1).add(target.times(mult)).pow(target))
+                req = softcap(req, new Decimal(305), new Decimal(2))
+                if (a.gte(req)) {
+                    target = target.add(1)
+                    a = a.minus(req)
+                }
+                if (a.lt(req)) break
+            }
+            player[this.layer].level = player[this.layer].level.max(target)
             player[this.layer].exp = new Decimal(0)
         };
         if (player.br.level.gte(tmp.br.nextBuff)) player.br.buff = player.br.buff.add(1)

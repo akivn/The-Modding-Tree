@@ -7,12 +7,16 @@ addLayer('crunch', {
 
     update() {
         if(
-           player.a.points.gte(new Decimal(2).pow(1024).add(1))
+           player.a.points.gte(new Decimal(2).pow(1024).add(1)) && player.i.infinities.lt(1)
         ) {
             options.forceOneTab = true;
             player.a.points = new Decimal(2).pow(1024).add(1e308)
             tmp.a.art.perSecond = new Decimal(0)
             showTab('crunch');
+        }
+        if (player.a.points.gte(new Decimal(2).pow(1024).add(1))) {
+            player.a.points = new Decimal(2).pow(1024).add(1)
+            tmp.a.art.perSecond = new Decimal(0)
         }
     },
     clickables: {

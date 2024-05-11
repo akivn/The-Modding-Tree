@@ -54,6 +54,7 @@ addLayer("b", {
     gainMult() {
         let mult = new Decimal(1)                          // Returns your multiplier to your gain of the prestige resource.
         if (hasUpgrade('h', 13)) mult = mult.div(upgradeEffect('h', 13))
+        if (hasAchievement('ac', 61)) mult = mult.div(10)
         return mult              // Factor in any bonuses multiplying gain here.
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.

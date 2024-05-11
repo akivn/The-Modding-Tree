@@ -46,6 +46,7 @@ addLayer("h", {
         let effect = player[this.layer].points.add(1).pow(basepow)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(8).add(1).pow(base)))
         if (hasUpgrade('sb', 11)) effect = effect.times(upgradeEffect('sb', 11))
+        if (hasAchievement('ac', 45)) effect = effect.pow(1.005)
         return effect
     },
     effect2() {
@@ -55,6 +56,7 @@ addLayer("h", {
         let effect = player[this.layer].points.add(1).pow(basepow)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(24).add(1).pow(base)))
         if (hasUpgrade('sb', 11)) effect = effect.times(upgradeEffect('sb', 11))
+        if (hasAchievement('ac', 45)) effect = effect.pow(1.005)
         return effect
     },
     effectDescription(){
