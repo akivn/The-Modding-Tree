@@ -67,7 +67,6 @@ addLayer("br", {
                 req = softcap(req, new Decimal(305), new Decimal(2))
                 if (a.gte(req)) {
                     target = target.add(1)
-                    a = a.minus(req)
                 }
                 if (a.lt(req)) break
             }
