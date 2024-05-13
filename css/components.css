@@ -7,6 +7,27 @@
 	font-size: 10px;
 	overflow: visible;
 }
+.upgNum {
+	position: absolute;
+    left: 1px;
+	right: 1px;
+    top: 0px;
+    font-size: 25px;
+    font-weight: bold;
+    color: rgb(128, 128, 128);
+    opacity: 0.6;
+    z-index: 1;
+}
+.upgrNum {
+	position: absolute;
+    left: 1px;
+    top: 2px;
+    font-size: 25px;
+    font-weight: bold;
+    color: rgb(63, 63, 63);
+    opacity: 0.5;
+    z-index: 0;
+}
 
 .achievement {
 	height: 90px;
@@ -147,10 +168,12 @@
 
 /* Used for respec button and similar */
 .longUpg {
+	position: relative;
+    top: -42px;
 	height: 50px;
 	width: 120px;
 	background: var(--points);
-	border-radius: 50%;
+	border-radius: 5%;
 	border: 2px solid;
 	border-color: rgba(0, 0, 0, 0.125);
 	font-size: 10px;
@@ -162,5 +185,11 @@
 	border-radius: 25%;
 	border: 2px solid;
 	border-color: rgba(0, 0, 0, 0.125);
+}
+
+.chalText {
+    position: relative;
+    top: -42px;
+    margin-bottom: -2px;
 }
 

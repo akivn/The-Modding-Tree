@@ -67,6 +67,9 @@ var displayThings = [
 	function() {
 		if (player.a.points.gte(1e281) && options.dandereMode && player.i.infinities.lt(1)) return `Jumpscare Incoming at 1.80e308 Arts!`
 	},
+	function() {
+		if (inChallenge('i', 22)) return `Current Science: ${format(player.a.science)}`
+	},
 ]
 
 // Determines when the game "ends"

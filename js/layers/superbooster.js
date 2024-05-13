@@ -2,6 +2,10 @@ addLayer("sb", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        auto() {
+            if (!player.sb.auto || !hasMilestone('i', 11)) return false
+            else return true
+        },
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -29,7 +33,10 @@ addLayer("sb", {
 
     type: "static",                         // Determines the formula used for calculating prestige currency.
     exponent: 1.2,
-    base: 1.1,  
+    base: 1.1,
+    autoPrestige() {
+        return (hasMilestone('i', 11) && player.sb.auto)
+    },    
     hotkeys: [
         {
             key: "B", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" for holding down ctrl.
@@ -49,9 +56,13 @@ addLayer("sb", {
     layerShown() { return hasUpgrade('h', 22) || player[this.layer].unlocked }, 
     passiveGeneration() {
     },
+    resetsNothing() {
+        return hasMilestone('i', 9)
+    },
     effect() {
         let effect = new Decimal(0.25).times(player.sb.points)
         if (player.br.buff.gte(3)) effect = effect.times(tmp.br.effect3)
+        if (inChallenge('i', 21)) effect = new Decimal(0)
         return effect
     },
     effectDescription(){
@@ -64,6 +75,7 @@ addLayer("sb", {
             cost: new Decimal(2),
             effect() {
                 let power = player.sb.points.add(1).pow(2.44)
+                if (inChallenge('i', 21)) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -76,4 +88,27 @@ addLayer("sb", {
             unlocked(){ return true},
         },
     },
-})
+    doReset(prestige) {
+        // Stage 1, almost always needed, makes resetting this layer not delete your progress
+        if (layers[prestige].row <= this.row) return ;
+    
+        // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
+        let keptMilestones = [];
+        if (hasMilestone('i', 3)) {
+            for (j=0; j<3; j++) {
+                if (hasMilestone('h', j)) keptMilestones.push(j)
+            }
+        }
+    
+        // Stage 3, track which main features you want to keep - milestones
+        let keep = [];
+        if (hasMilestone('i', 4)) keep.push('upgrades')
+    
+        // Stage 4, do the actual data reset
+        layerDataReset(this.layer, keep);
+    
+        // Stage 5, add back in the specific subfeatures you saved earlier
+        player[this.layer].milestones.push(...keptMilestones);
+    },
+    layerShown() {return hasUpgrade('a', 24) || player[this.layer].unlocked}}
+)

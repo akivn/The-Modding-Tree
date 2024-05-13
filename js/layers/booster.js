@@ -5,7 +5,7 @@ addLayer("b", {
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
         auto() {
-            if (!player.b.auto) return false
+            if (!player.b.auto || !hasMilestone('h', 3)) return false
             else return true
         },
     }},
@@ -34,7 +34,7 @@ addLayer("b", {
 
     type: "static",                         // Determines the formula used for calculating prestige currency.
     exponent(){
-        let exp = new Decimal(1.6)
+        let exp = new Decimal(1.6).add(Decimal.max(90, player.b.points.add(getResetGain('b', "static"))).minus(90).times(0.0004))
         return exp
     },
     canBuyMax() {
@@ -54,6 +54,7 @@ addLayer("b", {
     gainMult() {
         let mult = new Decimal(1)                          // Returns your multiplier to your gain of the prestige resource.
         if (hasUpgrade('h', 13)) mult = mult.div(upgradeEffect('h', 13))
+        if (hasUpgrade('i', 72)) mult = mult.div(upgradeEffect('i', 72))
         if (hasAchievement('ac', 61)) mult = mult.div(10)
         return mult              // Factor in any bonuses multiplying gain here.
     },
@@ -70,9 +71,12 @@ addLayer("b", {
     effect() {
         let base = new Decimal(2)
         base = base.add(tmp.sb.effect)
+        if (hasChallenge('i', 11)) base = base.add(0.3)
+        if (hasUpgrade('i', 113)) base = base.add(upgradeEffect('i', 113))
         if (hasAchievement('ac', 25)) base = base.add(achievementEffect('ac', 25))
         let effect = new Decimal(base).pow(player[this.layer].points)
         softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(10).log(10).div(10).add(1).pow(0.5)))
+        if (inChallenge('i', 21)) effect = effect.pow(0.5)
         return effect
     },
     effectDescription(){
@@ -105,7 +109,7 @@ addLayer("b", {
             description: "Boost Artwork progress based on your boosters.",
             cost: new Decimal(3),
             effect() {
-                let power = new Decimal(player.b.points.div(2).add(1).pow(2))
+                let power = new Decimal(2).times(player.b.points.div(2).add(1).pow(2))
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -146,7 +150,7 @@ addLayer("b", {
             cost: new Decimal(14),
             effect() {
                 let power = player.b.points.add(1).pow(1.5)
-                power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(5).add(1).pow(0.07)))  
+                power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(5).add(1).pow(0.07)))
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -167,12 +171,6 @@ addLayer("b", {
             title: "We need more Art Upgrades!",
             description: "Unlock 4 new Art Upgrades.",
             cost: new Decimal(19),
-            unlocked(){ return hasUpgrade('b', 14) },
-        },
-        24: {
-            title: "Powerup Tools",
-            description: "Unlock 4 more Art Upgrades",
-            cost: new Decimal(20),
             unlocked(){ return hasUpgrade('b', 14) },
         },
     },
@@ -208,7 +206,7 @@ addLayer("b", {
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
-        if (hasMilestone('h', 1)) keep.push("milestones")
+        if (hasMilestone('h', 1) || hasMilestone('i', 1)) keep.push("milestones")
         if (hasMilestone('h', 3)) keep.push("upgrades")
     
         // Stage 4, do the actual data reset

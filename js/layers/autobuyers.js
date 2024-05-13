@@ -132,5 +132,65 @@ addLayer("ab", {
                 }
             },
         },
+        31: {
+            title: "Super Boosters",
+            display() {
+                return hasMilestone("i", 11) ? (player.sb.auto ? "On" : "Off") : "Locked"
+            },
+            unlocked() {
+                return player.i.unlocked
+            },
+            canClick() {
+                return hasMilestone("i", 11)
+            },
+            onClick() {
+                player.sb.auto = !player.sb.auto
+            },
+            style: {
+                "background-color"() {
+                    return (player.sb.auto && hasMilestone("i", 11)) ? tmp.sb.color : "#666666"
+                }
+            },
+        },
+        32: {
+            title: "Breakthroughs",
+            display() {
+                return hasMilestone("i", 11) ? (player.br.auto ? "On" : "Off") : "Locked"
+            },
+            unlocked() {
+                return player.i.unlocked
+            },
+            canClick() {
+                return hasMilestone("i", 11)
+            },
+            onClick() {
+                player.br.auto = !player.br.auto
+            },
+            style: {
+                "background-color"() {
+                    return (player.br.auto && hasMilestone("i", 11)) ? tmp.br.color : "#666666"
+                }
+            },
+        },
+        33: {
+            title: "Breakthrough Buyables",
+            display() {
+                return hasMilestone("i", 7) ? (player.br.buyableAuto ? "On" : "Off") : "Locked"
+            },
+            unlocked() {
+                return player.h.unlocked
+            },
+            canClick() {
+                return hasMilestone("i", 7)
+            },
+            onClick() {
+                player.br.buyableAuto = !player.br.buyableAuto
+            },
+            style: {
+                "background-color"() {
+                    return (player.br.buyableAuto && hasMilestone("i", 7)) ? tmp.br.color : "#666666"
+                }
+            },
+        },
     },
 })

@@ -7,6 +7,10 @@ addLayer("h", {
         unlocked: false,
         points: new Decimal(0),
         time: new Decimal(0),
+        passive() {
+            if (!player.h.passive || !hasMilestone('i', 8)) return false
+            else return true
+        },
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -37,7 +41,13 @@ addLayer("h", {
     directMult() { // Use here instead if you want to directly boost after exponent
         mult = new Decimal(1)
         if (player.br.buff.gte(4)) mult = mult.times(tmp.br.effect4)
+        if (hasUpgrade('i', 82)) mult = mult.times(upgradeEffect('i', 82))
+        if (hasUpgrade('i', 102)) mult = mult.times(upgradeEffect('i', 102))
         return mult
+    },
+    passiveGeneration() {
+        if (hasMilestone('i', 7) && player.h.passive) return 0.1
+        else return 0
     },
     effect() {
         let basepow = new Decimal(2.75)
@@ -78,6 +88,7 @@ addLayer("h", {
             currencyLayer: 'a',
             effect() {
                 let power = player.a.artspace.add(10).log(10).minus(1).times(0.00167)
+                if (hasChallenge('i', 21)) power = power.times(1.2)
                 return power
             },
             canAfford() {
@@ -197,7 +208,8 @@ addLayer("h", {
             fullDisplay() {
                 let d1 = `<h2>Honour Yua Sakurai</h2><br>`
                 let cap = new Decimal(10)
-                if (hasUpgrade('h', 23)) return (d1 + `All Art Dimensions are stronger based on time since Honour Reset (Caps at ${format(cap)}x).<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
+                if (hasUpgrade('h', 23) && hasUpgrade('i', 71)) return (d1 + `All Art Dimensions are stronger based on time since Honour Reset.<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
+                    if (hasUpgrade('h', 23)) return (d1 + `All Art Dimensions are stronger based on time since Honour Reset (Caps at ${format(cap)}x).<br>Requires 1e130 Art Points to unlock.<br>Current Boost: x${format(upgradeEffect('h', 23))}`)
                 else return (d1 + `All Art Dimensions are stronger based on time since Honour Reset (Caps at ${format(cap)}x).<br>Requires 1e130 Art Points to unlock.`)
             },
             cost: new Decimal(1e130),
@@ -205,7 +217,8 @@ addLayer("h", {
             currencyLayer: 'a',
             effect() {
                 let power = player.h.time.add(1).pow(0.667)
-                if (power.gte(10)) power = new Decimal(10)
+                if (hasUpgrade('i', 71)) power = player.h.time.times(7).add(1).pow(0.7)
+                if (power.gte(10) && !hasUpgrade('i', 71)) power = new Decimal(10)
                 return power
             },
             canAfford() {
@@ -219,8 +232,8 @@ addLayer("h", {
         24: {
             fullDisplay() {
                 let d1 = `<h2>Honour Amu Hinamori</h2><br>`
-                if (hasUpgrade('h', 23)) return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough, and Honour Rem is 1.2x stronger.<br>Requires 1e154 Art Points to unlock.`)
-                else return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough, and Honour Rem is 1.2x stronger.<br>Requires 1e154 Art Points to unlock.`)
+                if (hasUpgrade('h', 23)) return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough.<br>Requires 1e154 Art Points to unlock.`)
+                else return (d1 + `"Watashi no Kokoro, Anrokku!" Unlock Breakthrough.<br>Requires 1e154 Art Points to unlock.`)
             },
             cost: new Decimal(1e154),
             currencyInternalName: "points",
@@ -314,16 +327,28 @@ addLayer("h", {
         if (layers[prestige].row <= this.row) return ;
     
         // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
-        let keptUpgrades = [];
+        let keptMilestones = [];
+        if (hasMilestone('i', 3)) {
+            for (j=0; j<3; j++) {
+                if (hasMilestone('h', j)) keptMilestones.push(j)
+            }
+        }
+        if (hasMilestone('i', 5)) {
+            for (j=0; j<9; j++) {
+                if (hasMilestone('h', j)) keptMilestones.push(j)
+            }
+        }
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
+        if (hasMilestone('i', 5)) keep.push('milestones')
+        if (hasMilestone('i', 6)) keep.push('upgrades')
     
         // Stage 4, do the actual data reset
         layerDataReset(this.layer, keep);
     
         // Stage 5, add back in the specific subfeatures you saved earlier
-        player[this.layer].upgrades.push(...keptUpgrades);
+        player[this.layer].milestones.push(...keptMilestones);
     },
     layerShown() {return hasUpgrade('a', 24) || player[this.layer].unlocked}
     }

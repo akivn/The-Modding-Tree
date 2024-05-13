@@ -12,6 +12,14 @@ addLayer("br", {
         buff: new Decimal(0),
         bulk: false,
         bulkLevel: new Decimal(0),
+        buyableAuto() {
+            if (!player.a.buyableAuto || !hasMilestone('i', 7)) return false
+            else return true
+        },
+        auto() {
+            if (!player.br.auto || !hasMilestone('i', 11)) return false
+            else return true
+        },
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -32,6 +40,9 @@ addLayer("br", {
 
     type: "static",                         // Determines the formula used for calculating prestige currency.
     exponent: 1.5,  
+    autoPrestige() {
+        return (hasMilestone('i', 11) && player.br.auto)
+    },  
     baseResource: "Arts", // Name of resource prestige is based on
     branches: ['h', 'g'],
     baseAmount() { return player.a.points },  // A function to return the current amount of baseResource.
@@ -42,6 +53,9 @@ addLayer("br", {
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
+    },
+    resetsNothing() {
+        return hasMilestone('i', 11)
     },
     perSecond() {
         let effect = player.a.points.add(10).log(10).div(100).times(player.br.points.pow(1.5))
@@ -64,7 +78,9 @@ addLayer("br", {
                 let a = player[this.layer].exp
                 let mult = new Decimal(0.01)
                 let req = new Decimal(15).times(new Decimal(1.1).add(target.times(mult)).pow(target))
+                if (hasChallenge('i', 12)) req = new Decimal(15).times(new Decimal(1.08).add(target.times(mult)).pow(target.div(1.1)))
                 req = softcap(req, new Decimal(305), new Decimal(2))
+                req = softcap(req, new Decimal(5.67e9), new Decimal(1).add(req.add(10).log(10).div(100)))
                 if (a.gte(req)) {
                     target = target.add(1)
                 }
@@ -79,28 +95,32 @@ addLayer("br", {
         let effect = player.br.level.minus(2).div(20).add(1)
         let base = new Decimal(0.7)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).add(1).pow(base)))
-        if (hasUpgrade('a', 34)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
     effect2() {
         let effect = new Decimal(1.3).pow(player.br.level.minus(5))
         let base = new Decimal(0.6)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(6).add(1).pow(base)))
-        if (hasUpgrade('a', 34)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
     effect3() {
         let effect = new Decimal(0.0222).times(player.br.level.minus(8)).add(1)
         let base = new Decimal(0.5)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(1).pow(base)))
-        if (hasUpgrade('a', 34)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
     effect4() {
         let effect = new Decimal(1.5).pow(player.br.level.minus(11))
         let base = new Decimal(0.6)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(3).add(1).pow(base)))
-        if (hasUpgrade('a', 34)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
     bars: {
@@ -111,7 +131,9 @@ addLayer("br", {
             req(){
                 let mult = new Decimal(0.01)
                 let req = new Decimal(15).times(new Decimal(1.1).add(player.br.level.times(mult)).pow(player.br.level))
+                if (hasChallenge('i', 12)) req = new Decimal(15).times(new Decimal(1.08).add(player.br.level.times(mult)).pow(player.br.level.div(1.1)))
                 req = softcap(req, new Decimal(305), new Decimal(2))
+                req = softcap(req, new Decimal(5.67e9), new Decimal(1).add(req.add(10).log(10).div(100)))
                 return req
             },
             base(){
@@ -168,7 +190,7 @@ addLayer("br", {
             currencyInternalName: "level",
             currencyLayer: 'br',
             effect() {
-                let power = player.h.points.pow(0.375)
+                let power = player.h.points.add(1).pow(0.375)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -288,12 +310,21 @@ addLayer("br", {
     
         // Stage 3, track which main features you want to keep - milestones
         let keep = [];
+        if (hasMilestone('i', 10)) keep.push("upgrades")
     
         // Stage 4, do the actual data reset
         layerDataReset(this.layer, keep);
     
         // Stage 5, add back in the specific subfeatures you saved earlier
         player[this.layer].upgrades.push(...keptUpgrades);
+    },
+    automate() {
+        if (hasMilestone('i', 7) && player.br.buyableAuto && !player.crunch.crunched) {
+            for (i=1;i<101;i++) {
+                buyBuyable('br', 11)
+                buyBuyable('br', 12)
+            }
+        }
     },  
 
     layerShown(){return hasUpgrade('h', 24) || player[this.layer].unlocked}
