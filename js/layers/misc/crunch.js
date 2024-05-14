@@ -47,7 +47,6 @@ addLayer('crunch', {
             display() { return 'Big Crunch' },
             canClick() { return true },
             onClick() {
-                func.respec()
                 player.i.fastestCrunch = Decimal.min(player.i.fastestCrunch, player.i.timeInCurrentInfinity);  
                 if (inChallenge('i', 11)) {
                     completeChallenge('i', 11)

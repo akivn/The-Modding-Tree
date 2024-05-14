@@ -34,6 +34,7 @@ addLayer("a", {
         dimshift: new Decimal(0),
         dimboost: new Decimal(0),
         science: new Decimal(1),
+        upgDisabled: false
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -89,6 +90,7 @@ addLayer("a", {
         if (hasUpgrade('i', 42)) multi = multi.times(upgradeEffect('i', 42))
         if (hasUpgrade('i', 43)) multi = multi.times(upgradeEffect('i', 43))
         if (hasUpgrade('i', 101)) multi = multi.times(upgradeEffect('i', 101))
+        if (hasUpgrade('i', 131)) multi = multi.times(upgradeEffect('i', 131))
         if (hasAchievement('ac', 61)) multi = multi.times(2)
         multi = multi.times(tmp.ac.effect2)
         return multi
@@ -124,6 +126,7 @@ addLayer("a", {
         },
         effect() {
             let effect = player.a.artspace.pow(0.4).add(1)
+            if (hasUpgrade('i', 151)) effect = player.a.artspace.pow(0.56).add(1)
             let base = new Decimal(0.625)
             if (hasUpgrade('br', 11)) base = upgradeEffect('br', 11)
             else if (hasUpgrade('h', 14)) base = upgradeEffect('h', 14)
@@ -252,6 +255,7 @@ addLayer("a", {
                 if (hasUpgrade ('a', 24)) power = power.times(upgradeEffect('a', 24))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
                 if (hasUpgrade ('i', 111)) power = power.times(upgradeEffect('i', 111))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 35)) power = power.times(1.2)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
@@ -294,6 +298,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought2)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -331,6 +336,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought3)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -369,6 +375,7 @@ addLayer("a", {
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 12)) power = power.times(upgradeEffect('h', 12))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -406,6 +413,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought5)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -444,6 +452,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought6)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 54)) power = power.times(achievementEffect('ac', 54))
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
@@ -483,6 +492,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought7)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -521,6 +531,7 @@ addLayer("a", {
                 let power = new Decimal(base).pow(player.a.bought8)
                 if (hasUpgrade ('b', 23)) power = power.times(upgradeEffect('b', 23))
                 if (hasUpgrade ('h', 23)) power = power.times(upgradeEffect('h', 23))
+                power = power.times(tmp.i.infpower.effect)
                 if (hasAchievement('ac', 53)) power = power.times(1.01)
                 return power
             },
@@ -554,7 +565,7 @@ addLayer("a", {
             cost: new Decimal(15),
             effect() {
                 let power = new Decimal(player.a.totalArt.add(10).log(10).pow(2))
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -566,7 +577,7 @@ addLayer("a", {
             cost: new Decimal(40),
             effect() {
                 let power = new Decimal(player.points.add(10).log(10))
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -578,7 +589,7 @@ addLayer("a", {
             cost: new Decimal(250),
             effect() {
                 let power = new Decimal(tmp.a.bars.Art.req.add(10).log(10).pow(1.3))
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -599,7 +610,7 @@ addLayer("a", {
                 let power = player.a.points.add(1).pow(base)
                 power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(5).add(1).pow(0.075)))  
                 if (hasUpgrade('br', 12)) power = power.pow(1.3)
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -617,7 +628,7 @@ addLayer("a", {
             cost: new Decimal(1e43),
             effect() {
                 let power = player.a.points.add(10).log(10).div(30)
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id), 4)}` },
@@ -631,7 +642,7 @@ addLayer("a", {
                 let power = new Decimal(1.222).pow(player.b.points)
                 if (player.br.buff.gte(1)) power = power.pow(tmp.br.effect1)
                 power = softcap(power, new Decimal(1), new Decimal(1).div(power.log(10).div(10).add(1).pow(0.167)))
-                if (inChallenge('i', 11)) power = new Decimal(1)  
+                if (player.a.upgDisabled) power = new Decimal(1)  
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
@@ -649,7 +660,7 @@ addLayer("a", {
                       }
                 }
                 let power = new Decimal(1.3).pow(length)
-                if (inChallenge('i', 11)) power = new Decimal(1) 
+                if (player.a.upgDisabled) power = new Decimal(1) 
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
@@ -661,7 +672,7 @@ addLayer("a", {
             cost: new Decimal(1e228),
             effect() {
                 let power = new Decimal(1.5).pow(player.sb.points)
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
@@ -673,7 +684,7 @@ addLayer("a", {
             cost: new Decimal(1e253),
             effect() {
                 let power = new Decimal(10).pow(player.br.level)
-                if (inChallenge('i', 11)) power = new Decimal(1)
+                if (player.a.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}` },

@@ -3,7 +3,7 @@ let modInfo = {
 	id: "mikiart2",
 	author: "akivn",
 	pointsName: "Experience",
-	modFiles: ["layers/art.js", "layers/breakthrough.js", "layers/infinity.js", "layers/misc/crunch.js", "layers/superbooster.js", "layers/honour.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
+	modFiles: ["layers/art.js", "layers/rocket.js", "layers/breakthrough.js", "layers/infinity.js", "layers/misc/crunch.js", "layers/superbooster.js", "layers/honour.js", "layers/booster.js", "layers/generator.js", "layers/autobuyers.js", "layers/achievement.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -47,6 +47,7 @@ function getPointGen() {
 	if (hasUpgrade('a', 21)) gain = gain.times(upgradeEffect('a', 21))
 	if (hasUpgrade('a', 31)) gain = gain.times(upgradeEffect('a', 31))
 	gain = gain.times(tmp.b.effect)
+	gain = gain.pow(tmp.r.effect)
 	gain = gain.times(tmp.ac.effect)
 	if (hasAchievement('ac', 15)) gain = gain.times(achievementEffect('ac', 15))
 	return gain

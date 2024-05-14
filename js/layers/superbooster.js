@@ -6,6 +6,8 @@ addLayer("sb", {
             if (!player.sb.auto || !hasMilestone('i', 11)) return false
             else return true
         },
+        disabled: false,
+        upgDisabled: false,
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -62,7 +64,7 @@ addLayer("sb", {
     effect() {
         let effect = new Decimal(0.25).times(player.sb.points)
         if (player.br.buff.gte(3)) effect = effect.times(tmp.br.effect3)
-        if (inChallenge('i', 21)) effect = new Decimal(0)
+        if (player.sb.disabled) effect = new Decimal(0)
         return effect
     },
     effectDescription(){
@@ -75,7 +77,7 @@ addLayer("sb", {
             cost: new Decimal(2),
             effect() {
                 let power = player.sb.points.add(1).pow(2.44)
-                if (inChallenge('i', 21)) power = new Decimal(1)
+                if (player.sb.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },

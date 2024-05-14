@@ -2,7 +2,12 @@ const func = {
     respec() {
         if(getClickableState('i', 'respecOnNextInfinity') === 'ON') {
             player.i.studyPoints = tmp.i.maxStudyPoints;
-            player.i.upgrades = [51,61,91]
+            if (hasUpgrade('i', 141)) {player.i.upgrades = [51, 61, 91, 121, 141];player.i.studyPoints = player.i.studyPoints.minus(16)}
+            else if (hasUpgrade('i', 121)) {player.i.upgrades = [51, 61, 91, 121];player.i.studyPoints = player.i.studyPoints.minus(16)}
+            else if (hasUpgrade('i', 91)) {player.i.upgrades = [51, 61, 91];player.i.studyPoints = player.i.studyPoints.minus(8)}
+            else if (hasUpgrade('i', 61)) {player.i.upgrades = [51, 61];player.i.studyPoints = player.i.studyPoints.minus(4)}
+            else if (hasUpgrade('i', 51)) {player.i.upgrades = [51];player.i.studyPoints = player.i.studyPoints.minus(2)}
+            else player.i.upgrades = []
             player.i.clickables.respecOnNextInfinity = 'OFF'
         }
     }
@@ -27,6 +32,16 @@ addLayer("i", {
         challenge3Best: new Decimal(1e99),
         challenge4Time: new Decimal(0),
         challenge4Best: new Decimal(1e99),
+        ipps: new Decimal(0),
+        infpower: new Decimal(0),
+        bought1: new Decimal(0),
+        bought2: new Decimal(0),
+        bought3: new Decimal(0),
+        bought4: new Decimal(0),
+        bought5: new Decimal(0),
+        bought6: new Decimal(0),
+        bought7: new Decimal(0),
+        bought8: new Decimal(0),
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -76,12 +91,29 @@ addLayer("i", {
         }
         return complete
     },
+    infpower: {
+        perSecond() {
+            let perSecond = buyableEffect('i', 101)
+            if (player.i.timeInCurrentInfinity<=0.07) perSecond = new Decimal(0)
+            return perSecond
+        },
+        effect() {
+            let effect = player.i.infpower.pow(5).add(1)
+            let base = new Decimal(0.4625)
+            effect = effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(308).add(1).pow(base)))  
+            return effect
+        },
+    },
     update(delta) {
         player.i.timeInCurrentInfinity = player.i.timeInCurrentInfinity.add(Decimal.times(new Decimal(1), delta))
+        if (player.i.timeInCurrentInfinity.gt(0)) ipps = getResetGain('i', "normal").div(player.i.timeInCurrentInfinity)
+        if (player.i.timeInCurrentInfinity == new Decimal(0)) ipps = new Decimal(0)
         if (inChallenge('i', 11)) player.i.challenge1Time = player.i.timeInCurrentInfinity
         if (inChallenge('i', 12)) player.i.challenge2Time = player.i.timeInCurrentInfinity
         if (inChallenge('i', 21)) player.i.challenge3Time = player.i.timeInCurrentInfinity
         if (inChallenge('i', 22)) player.i.challenge4Time = player.i.timeInCurrentInfinity
+        player.i.infpower = player.i.infpower.add(Decimal.times(tmp.i.infpower.perSecond, delta))
+        player.i.buyables[101] = player.i.buyables[101].add(Decimal.times(tmp.i.buyables[102].effect, delta));
     },
     upgrades: {
         11: {
@@ -292,7 +324,7 @@ addLayer("i", {
         101: {
             title: "Normal I",
             description: "Art gain is boosted by the number of Generators you have.",
-            canAfford() {return (!hasUpgrade('i', 102) && !hasUpgrade('i', 103)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            canAfford() {return (!hasUpgrade('i', 102) && !hasUpgrade('i', 103)) && (hasUpgrade('i', 81) || hasUpgrade('i', 82)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
             cost: new Decimal(4),
             currencyDisplayName: "Studies",
             currencyInternalName: "studyPoints",
@@ -308,7 +340,7 @@ addLayer("i", {
         102: {
             title: "Honour I",
             description: "Honour gain is boosted by the number of Generators you have.",
-            canAfford() {return (!hasUpgrade('i', 101) && !hasUpgrade('i', 103)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            canAfford() {return (!hasUpgrade('i', 101) && !hasUpgrade('i', 103)) && (hasUpgrade('i', 81) || hasUpgrade('i', 82)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
             cost: new Decimal(4),
             currencyDisplayName: "Studies",
             currencyInternalName: "studyPoints",
@@ -324,7 +356,7 @@ addLayer("i", {
         103: {
             title: "Infinity I",
             description: "Infinity Point gain is boosted by the number of Generators you have.",
-            canAfford() {return (!hasUpgrade('i', 101) && !hasUpgrade('i', 102)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            canAfford() {return (!hasUpgrade('i', 101) && !hasUpgrade('i', 102)) && (hasUpgrade('i', 81) || hasUpgrade('i', 82)) && hasUpgrade('i', 91) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
             cost: new Decimal(4),
             currencyDisplayName: "Studies",
             currencyInternalName: "studyPoints",
@@ -372,7 +404,7 @@ addLayer("i", {
         },
         113: {
             title: "Infinity II",
-            description: "Your sum of the first 4 challenge times boost Booster's Base. (after softcap).",
+            description: "Your sum of the first 4 challenge times boost Booster's Base.",
             canAfford() {return hasUpgrade('i', 103) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
             cost: new Decimal(4),
             currencyDisplayName: "Studies",
@@ -386,6 +418,107 @@ addLayer("i", {
             effectDisplay() { return "+" + format(upgradeEffect(this.layer, this.id)) },
             unlocked(){ return true},
             branches: [103]
+        },
+        121: {
+            title: "Let's Rocket!",
+            description: "Unlock Rocket.",
+            canAfford() {return ((hasUpgrade('i', 111) || hasUpgrade('i', 112) || hasUpgrade('i', 113)) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost) && tmp.i.totalCompletions.gte(4))},
+            cost: new Decimal(8),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            unlocked(){ return true},
+            branches: [111,112,113]
+        },
+        131: {
+            title: "The Rocket Artist",
+            description: "Each rocket gives a boost of 1e12x on Art gain.",
+            canAfford() {return !hasUpgrade('i', 132) && (hasUpgrade('i', 111) || hasUpgrade('i', 112) || hasUpgrade('i', 113)) && hasUpgrade('i', 121) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(6),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            effect() {
+                let power = new Decimal(1e12).pow(player.r.points)
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true},
+            branches: [121]
+        },
+        132: {
+            title: "The Infinity Artist",
+            description: "Every 5 Generators boost Infinity Point gain by 1.08x.",
+            canAfford() {return !hasUpgrade('i', 131) && (hasUpgrade('i', 111) || hasUpgrade('i', 112) || hasUpgrade('i', 113)) && hasUpgrade('i', 121) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(6),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            effect() {
+                let power = new Decimal(1.08).pow(player.g.points.div(5).floor())
+                return power
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+            unlocked(){ return true},
+            branches: [121]
+        },
+        141: {
+            fullDisplay() {
+                return `<h2>A Brand new Set of Spaces!</h2><br>Unlock Infinity Dimensions.<br>Requires: 2e9 IP`
+            },
+            canAfford() {return ((hasUpgrade('i', 131) || hasUpgrade('i', 132)) && player.i.points.gte(tmp.i.upgrades[this.id].cost) && tmp.i.totalCompletions.gte(4))},
+            cost: new Decimal(2e9),
+            currencyDisplayName: "Infinity Points",
+            currencyInternalName: "points",
+            currencyLayer: "i",
+            buy() {
+                return
+            },
+            unlocked(){ return true},
+            branches: [131,132]
+        },
+        151: {
+            title: "Stronger Boost",
+            description: "Artspace conversion to Art gain boost scales better.",
+            canAfford() {return !hasUpgrade('i', 152) && (hasUpgrade('i', 131) || hasUpgrade('i', 132)) && hasUpgrade('i', 141) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(4),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            unlocked(){ return true},
+            branches: [141]
+        },
+        152: {
+            title: "The Alpha Chain",
+            description: "Art Dimension 1 count Divides Breakthrough requirement.",
+            canAfford() {return !hasUpgrade('i', 151) && (hasUpgrade('i', 131) || hasUpgrade('i', 132)) && hasUpgrade('i', 141) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(4),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            effect() {
+                let power = getBuyableAmount('a', 101).add(10).log(10).pow(8)
+                return power
+            },
+            effectDisplay() { return "/" + format(upgradeEffect(this.layer, this.id)) },
+            unlocked(){ return true},
+            branches: [141]
+        },
+        161: {
+            title: "Rocket Transformation I",
+            description: "Rocket Boosts Honour gain.",
+            canAfford() {return hasUpgrade('i', 151) && player.i.studyPoints.gte(tmp.i.upgrades[this.id].cost)},
+            cost: new Decimal(8),
+            currencyDisplayName: "Studies",
+            currencyInternalName: "studyPoints",
+            currencyLayer: "i",
+            effect() {
+                let power = new Decimal(10).pow(player.r.points)
+                return power
+            },
+            effectDisplay() { return "+" + format(upgradeEffect(this.layer, this.id)) },
+            unlocked(){ return true},
+            branches: [151]
         },
     },
     buyables: {
@@ -421,7 +554,7 @@ addLayer("i", {
             style() { return { height: '60px' } }
         },
         'ip': {
-            cost() { return new Decimal(2).pow(getBuyableAmount(this.layer, this.id)).pow(new Decimal(1.3).add(Decimal.max(getBuyableAmount(this.layer, this.id), 11).minus(11).times(0.02))).times(10).ceil() },
+            cost() { return new Decimal(2).pow(getBuyableAmount(this.layer, this.id)).pow(new Decimal(1.3).add(Decimal.max(getBuyableAmount(this.layer, this.id), 11).minus(11).times(0.04))).times(10).ceil() },
             canAfford() { return player.i.points.gte(this.cost()) },
             display() { return `x2 IP gain<br>Cost: ${formatWhole(tmp.i.buyables['ip'].cost)} Infinity Points<br>Currently: x${format(tmp.i.buyables['ip'].effect)}` },
             buy() { player.i.points = player.i.points.minus(this.cost()); setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).plus(1)) },
@@ -431,6 +564,80 @@ addLayer("i", {
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
             unlocked() {return hasUpgrade('i', 51)}
+        },
+        101: {
+            title: "Infinity Dimension 1",
+            cost() { 
+                let base = new Decimal(1e4)
+                let cost = new Decimal(base).pow(player.i.bought1).times(1e9)
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(2).log(2).minus(512).div(512).minus(1)).pow(0.8))
+                return cost 
+            },
+            effect2(){
+                let base = new Decimal(2)
+                let power = new Decimal(base).pow(player.i.bought1)
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " IP"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.i.bought1, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.i.points.gte(this.cost()) },
+            buy() {
+                player.i.points = player.i.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.i.bought1 = player.i.bought1.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
+        },
+        102: {
+            title: "Infinity Dimension 2",
+            cost() { 
+                let base = new Decimal(1e6)
+                let cost = new Decimal(base).pow(player.i.bought2).times(1e14)
+                cost = softcap(cost, new Decimal(2).pow(1024), new Decimal(1).add(cost.add(2).log(2).minus(512).div(512).minus(1)).pow(0.8))
+                return cost 
+            },
+            effect2(){
+                let base = new Decimal(2)
+                let power = new Decimal(base).pow(player.i.bought2)
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            effect(x){
+                let power = tmp[this.layer].buyables[this.id].effect2.times(x)
+                return power
+            },
+            display() { let data = tmp[this.layer].buyables[this.id]
+                let d1 = "Cost: " + format(data.cost) + " IP"
+                return `${d1}\n\
+                Amount: ${format(getBuyableAmount(this.layer, this.id), 2)} (${commaFormat(player.i.bought2, 0)})\n\
+                ${format(tmp[this.layer].buyables[this.id].effect2, 2)}x`
+            },
+            canAfford() { return player.i.points.gte(this.cost()) },
+            buy() {
+                player.i.points = player.i.points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player.i.bought2 = player.i.bought2.add(1)
+            },
+            style() {
+                return {height: '66px', width: '200px'}
+            }, 
         },
     },
     challenges: {
@@ -447,15 +654,18 @@ addLayer("i", {
             onEnter() {
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.a.upgDisabled = true
             },
             onExit() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.a.upgDisabled = false
             },
             onComplete() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
+                player.a.upgDisabled = false
             },
         },
         12: {
@@ -472,15 +682,21 @@ addLayer("i", {
             onEnter() {
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.g.disabled = true
+                player.g.upgDisabled = true
             },
             onExit() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.g.disabled = false
+                player.g.upgDisabled = false
             },
             onComplete() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
+                player.g.disabled = false
+                player.g.upgDisabled = false
             },
         },
         21: {
@@ -497,15 +713,21 @@ addLayer("i", {
             onEnter() {
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.sb.disabled = true
+                player.sb.upgDisabled = true
             },
             onExit() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
                 player.crunch.crunched = false
+                player.sb.disabled = false
+                player.sb.upgDisabled = false
             },
             onComplete() {
                 func.respec()
                 player.i.timeInCurrentInfinity = new Decimal(0)
+                player.sb.disabled = false
+                player.sb.upgDisabled = false
             },
         },
         22: {
@@ -608,7 +830,7 @@ addLayer("i", {
         'crunch': {
             display() { 
                 if (!hasUpgrade('i', 91)) return 'Perform a Big Crunch' 
-                else return `Perform a Big Crunch for ${format(getResetGain('i', "normal"))} Infinity Points.` 
+                else return `<h5>+${format(getResetGain('i', "normal"))} IP<br>(${format(ipps)} IP/s)</h5>` 
             },
             canClick() { return player.a.points.gte(new Decimal(2).pow(1024)) },
             onClick() {
@@ -697,14 +919,14 @@ addLayer("i", {
     tabFormat: {
         "Upgrades": {
             content: [
-                ["clickable", 'crunch'],
                 "main-display",
+                ["clickable", 'crunch'],
                 "blank",
                 ['display-text', function() {
                     return `Your Current Crunch time is ${formatTime(player.i.timeInCurrentInfinity)}<br>Your best crunch time is ${formatTime(player.i.fastestCrunch)}` }, { 'font-size': '15px', 'color': 'silver'}
                 ],
                 ['raw-html', function() {
-                    if (player.i.studyPoints.gte(new Decimal(1)) && player.i.studyPoints.lte(new Decimal(1))) return `<div>You have <h2 v-bind>${formatWhole(player.i.studyPoints)}</h2> Study <br><br></div>`
+                    if (player.i.studyPoints.gte(new Decimal(1)) && player.i.studyPoints.lte(new Decimal(1))) return `<div>You have <h2 v-bind>${formatWhole(player.i.studyPoints)}</h2>/${formatWhole(tmp.i.maxStudyPoints)} Study <br><br></div>`
                     return `<div>You have <h2 v-bind>${formatWhole(player.i.studyPoints)}</h2>/${formatWhole(tmp.i.maxStudyPoints)} Studies <br><br></div>`}
                 ],
                 ["row", [["clickable", 'buyMax1'], ["clickable", 'buyMax2'],, ["clickable", 'buyMax3'],]],
@@ -715,22 +937,22 @@ addLayer("i", {
                 ["clickable", 'respecOnNextInfinity'],
                 "blank",
                 ["upgrade-tree",
-                    [[11], [21,22], [31], [41,42,43], [51], [61], [71,72], [81,82], [91], [101,102,103], [111,112,113]]
+                    [[11], [21,22], [31], [41,42,43], [51], [61], [71,72], [81,82], [91], [101,102,103], [111,112,113], [121], [131,132], [141], [151,152],]
                 ]
             ],
         },
         "Milestones": {
             content: [
-                ["clickable", 'crunch'],
                 "main-display",
+                ["clickable", 'crunch'],
                 "blank",
                 "milestones",
             ],
         },
         "Challenges": {
             content: [
-                ["clickable", 'crunch'],
                 "main-display",
+                ["clickable", 'crunch'],
                 "blank",
                 ['display-text', function() {
                     return `Unless otherwise specified, all Challenge goals are Infinite (1.80e308) Arts.` }, { 'font-size': '15px', 'color': 'silver'}
@@ -742,7 +964,40 @@ addLayer("i", {
                 "challenges",
             ],
             unlocked() {return hasUpgrade('i', 61)}
-        }
+        },
+        "Dimensions": {
+            content: [
+                "main-display",
+                ["clickable", 'crunch'],
+                ['raw-html', function() {
+                    return `<div><span v-if="player.a.artspace.lt('1e1000')">You have </span><h2 v-bind>${format(player.i.infpower)}</h2> Infinity Power<br><br></div>`}
+                ],
+                ['display-text', function() {
+                    return `Your Infinity Power is boosting Art Dimensions by ${format(tmp.i.infpower.effect)}x`}, { 'font-size': '15px', 'color': 'silver'}],
+                ['display-text', function() {
+                    return `Infinity Power gain: ${format(tmp.i.infpower.perSecond)} / sec` }, { 'font-size': '15px', 'color': 'silver'}
+                ],
+                "blank",
+                ["buyable", 101],
+                ["buyable", 102],
+            ],
+            unlocked() {return hasUpgrade('i', 141)}
+        },
+    },
+    doReset(prestige) {
+        // Stage 1, almost always needed, makes resetting this layer not delete your progress
+        if (layers[prestige].row <= this.row) return;
+    
+        // Stage 2, track which specific subfeatures you want to keep, e.g. Upgrade 21, Milestones
+        let keptUpgrades = [];
+    
+        // Stage 3, track which main features you want to keep - milestones
+        let keep = [];
+        // Stage 4, do the actual data reset
+        layerDataReset(this.layer, keep);
+    
+        // Stage 5, add back in the specific subfeatures you saved earlier
+        player[this.layer].upgrades.push(...keptUpgrades);
     },
     layerShown(){return player.i.infinities.gte(0.1)}
 })

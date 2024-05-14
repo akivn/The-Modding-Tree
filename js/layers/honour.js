@@ -43,6 +43,7 @@ addLayer("h", {
         if (player.br.buff.gte(4)) mult = mult.times(tmp.br.effect4)
         if (hasUpgrade('i', 82)) mult = mult.times(upgradeEffect('i', 82))
         if (hasUpgrade('i', 102)) mult = mult.times(upgradeEffect('i', 102))
+        if (hasUpgrade('i', 161)) mult = mult.times(upgradeEffect('i', 161))
         return mult
     },
     passiveGeneration() {
@@ -349,6 +350,10 @@ addLayer("h", {
     
         // Stage 5, add back in the specific subfeatures you saved earlier
         player[this.layer].milestones.push(...keptMilestones);
+        if (layers[prestige].row >= 3) {
+            player.i.infpower = new Decimal(0)
+            setBuyableAmount('i', 101, player.i.bought1)
+        };
     },
     layerShown() {return hasUpgrade('a', 24) || player[this.layer].unlocked}
     }

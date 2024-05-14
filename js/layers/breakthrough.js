@@ -81,6 +81,7 @@ addLayer("br", {
                 if (hasChallenge('i', 12)) req = new Decimal(15).times(new Decimal(1.08).add(target.times(mult)).pow(target.div(1.1)))
                 req = softcap(req, new Decimal(305), new Decimal(2))
                 req = softcap(req, new Decimal(5.67e9), new Decimal(1).add(req.add(10).log(10).div(100)))
+                if (hasUpgrade('i', 152)) req = req.div(upgradeEffect('i', 152))
                 if (a.gte(req)) {
                     target = target.add(1)
                 }
@@ -95,7 +96,7 @@ addLayer("br", {
         let effect = player.br.level.minus(2).div(20).add(1)
         let base = new Decimal(0.7)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).add(1).pow(base)))
-        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !(player.a.upgDisabled)) effect = effect.pow(1.1)
         if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
@@ -103,7 +104,7 @@ addLayer("br", {
         let effect = new Decimal(1.3).pow(player.br.level.minus(5))
         let base = new Decimal(0.6)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(6).add(1).pow(base)))
-        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !(player.a.upgDisabled)) effect = effect.pow(1.1)
         if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
@@ -111,7 +112,7 @@ addLayer("br", {
         let effect = new Decimal(0.0222).times(player.br.level.minus(8)).add(1)
         let base = new Decimal(0.5)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.add(1).pow(base)))
-        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !(player.a.upgDisabled)) effect = effect.pow(1.1)
         if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
@@ -119,7 +120,7 @@ addLayer("br", {
         let effect = new Decimal(1.5).pow(player.br.level.minus(11))
         let base = new Decimal(0.6)
         effect = softcap(effect, new Decimal(1), new Decimal(1).div(effect.log(10).div(3).add(1).pow(base)))
-        if (hasUpgrade('a', 34) && !inChallenge('i', 11)) effect = effect.pow(1.1)
+        if (hasUpgrade('a', 34) && !(player.a.upgDisabled)) effect = effect.pow(1.1)
         if (hasUpgrade('i', 81)) effect = effect.pow(upgradeEffect('i', 81))
         return effect 
     },
@@ -134,6 +135,7 @@ addLayer("br", {
                 if (hasChallenge('i', 12)) req = new Decimal(15).times(new Decimal(1.08).add(player.br.level.times(mult)).pow(player.br.level.div(1.1)))
                 req = softcap(req, new Decimal(305), new Decimal(2))
                 req = softcap(req, new Decimal(5.67e9), new Decimal(1).add(req.add(10).log(10).div(100)))
+                if (hasUpgrade('i', 152)) req = req.div(upgradeEffect('i', 152))
                 return req
             },
             base(){
@@ -211,14 +213,13 @@ addLayer("br", {
             },
             display() { let data = tmp[this.layer].buyables[this.id]
                 let d1 = "Cost: " + formatWhole(data.cost) + " Generators"
-                if (data.cost.lte(1) && data.cost.gte(1)) d1 = "Cost: " + formatWhole(data.cost) + " Generators"
+                if (data.cost.lte(1) && data.cost.gte(1)) d1 = "Requires: " + formatWhole(data.cost) + " Generators"
                 return `${d1}\n\
                 Amount: ${player[this.layer].buyables[this.id]}\n\
                 Gain ${format(buyableEffect(this.layer, this.id))}x more XP per second`
             },
             canAfford() { return player.g.points.gte(this.cost()) && player.br.unlocked },
             buy() {
-                player.g.points = player.g.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             style() {

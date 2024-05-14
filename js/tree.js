@@ -7,7 +7,7 @@ var layoutInfo = {
         ['a'],
         ['b', 'g'],
         ['sb', 'h', 'br'],
-        ['i'],
+        ['i', 'r'],
     ]
 
     

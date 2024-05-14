@@ -140,7 +140,6 @@
     margin-bottom: -2px;
 }
 
-
 /* Tiles are gridables */
 .tile {
 	height: 80px;
@@ -190,6 +189,6 @@
 .chalText {
     position: relative;
     top: -42px;
-    margin-bottom: -2px;
+    margin-bottom: -0px;
 }
 

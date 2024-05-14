@@ -13,6 +13,8 @@ addLayer("g", {
             if (!player.g.buyableAuto || !hasMilestone('h', 3)) return false
             else return true
         },
+        disabled: false,
+        upgDisabled: false
     }},
     nodeStyle() {
         return options.imageNode ? {
@@ -63,7 +65,7 @@ addLayer("g", {
         let mult = new Decimal(1)                          // Returns your multiplier to your gain of the prestige resource.
         if (hasUpgrade('a', 33)) mult = mult.div(upgradeEffect('a', 33))
         if (hasAchievement('ac', 61)) mult = mult.div(10)
-        if (hasUpgrade ('i', 112)) power = power.times(upgradeEffect('i', 112))
+        if (hasUpgrade ('i', 112)) mult = mult.times(upgradeEffect('i', 112))
         return mult              // Factor in any bonuses multiplying gain here.
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
@@ -80,7 +82,7 @@ addLayer("g", {
         effect() {
             let a = tmp.g.buyables["effectup"].effect
             let effect = player.g.power.add(10).log(10).pow(a)
-            if (inChallenge('i', 12)) effect = new Decimal(1)
+            if (player.g.disabled) effect = new Decimal(1)
             return effect
         },
         perSecond() {
@@ -156,7 +158,7 @@ addLayer("g", {
             },
             effect(x){
                 let power = new Decimal(1).add(x.times(0.3)).pow(0.7)
-                if (hasUpgrade('a', 22) && !inChallenge('i', 11)) power = new Decimal(1).add(x.times(0.36)).pow(0.73)
+                if (hasUpgrade('a', 22) && !(player.a.upgDisabled)) power = new Decimal(1).add(x.times(0.36)).pow(0.73)
                 if (hasUpgrade('i', 21)) power = power.times(1.2)
                 return power
             },
@@ -184,7 +186,7 @@ addLayer("g", {
             cost: new Decimal(5),
             effect() {
                 let power = new Decimal(1.2).pow(player.g.points)
-                if (inChallenge('i', 12)) power = new Decimal(1)
+                if (player.g.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x for both" },
@@ -196,7 +198,7 @@ addLayer("g", {
             cost: new Decimal(7),
             effect() {
                 let power = new Decimal(1.22).pow(player.g.points)
-                if (inChallenge('i', 12)) power = new Decimal(1)
+                if (player.g.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
@@ -214,7 +216,7 @@ addLayer("g", {
             cost: new Decimal(9),
             effect() {
                 let power = player.a.artspace.add(10).log(10).pow(2.8)
-                if (inChallenge('i', 12)) power = new Decimal(1)
+                if (player.g.upgDisabled) power = new Decimal(1)
                 return power
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
