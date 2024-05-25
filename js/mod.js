@@ -21,7 +21,10 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.011</h3><br>
 		- Added 7 layers across 4 rows!<br>
 		- Added more features!<br>
-		- Endgame at infinite APs!`
+		- Endgame at infinite APs!
+	<h3>v0.012</h3><br>
+		- Fixed Art upgrades 9 - 12 showing already on start<br>
+		- Fixed performing a lower-tier reset when crunched would hinder your autobuyers. You can still prestige even if you have crunched if you have crunched for the first time!`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
