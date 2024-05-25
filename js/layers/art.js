@@ -664,7 +664,7 @@ addLayer("a", {
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
-            unlocked(){ return hasUpgrade('sb', 12) || player.i.unlocked },
+            unlocked(){ return hasUpgrade('sb', 12) || player.i.infinities.gte(1) },
         },
         32: {
             title: "Everyday Level Up!!",
@@ -676,7 +676,7 @@ addLayer("a", {
                 return power
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}x` },
-            unlocked(){ return hasUpgrade('sb', 12) || player.i.unlocked },
+            unlocked(){ return hasUpgrade('sb', 12) || player.i.infinities.gte(1) },
         },
         33: {
             title: "Generation II",
@@ -688,13 +688,13 @@ addLayer("a", {
                 return power
             },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}` },
-            unlocked(){ return hasUpgrade('sb', 12) || player.i.unlocked },
+            unlocked(){ return hasUpgrade('sb', 12) || player.i.infinities.gte(1) },
         },
         34: {
             title: "Colourful Canvas!",
             description: "All buffs in Breakthrough are raised to ^1.1.",
             cost: new Decimal(1e278),
-            unlocked(){ return hasUpgrade('sb', 12) || player.i.unlocked },
+            unlocked(){ return hasUpgrade('sb', 12) || player.i.infinities.gte(1) },
         },
     },
     bars: {
@@ -808,7 +808,7 @@ addLayer("a", {
         if (!hasMilestone('h', 1)) player.a.dimAuto = false
     },
     automate() {
-        if (hasMilestone('h', 1) && player.a.dimAuto && hasUpgrade('g', 13) && !player.crunch.crunched) {
+        if (hasMilestone('h', 1) && player.a.dimAuto && hasUpgrade('g', 13)) {
             for (i=1;i<101;i++) {
                 buyBuyable('a', 101)
                 buyBuyable('a', 102)
@@ -820,7 +820,7 @@ addLayer("a", {
                 if (tmp.a.buyables[108].unlocked) buyBuyable('a', 108)
             }
         }
-        if (player.a.buyableAuto && hasMilestone("b", 2) && !player.crunch.crunched) {
+        if (player.a.buyableAuto && hasMilestone("b", 2)) {
             for(i=1;i<101;i++){
                 buyBuyable("a", "expboost")
                 buyBuyable("a", "enlarge")

@@ -320,7 +320,7 @@ addLayer("br", {
         player[this.layer].upgrades.push(...keptUpgrades);
     },
     automate() {
-        if (hasMilestone('i', 7) && player.br.buyableAuto && !player.crunch.crunched) {
+        if (hasMilestone('i', 7) && player.br.buyableAuto) {
             for (i=1;i<101;i++) {
                 buyBuyable('br', 11)
                 buyBuyable('br', 12)

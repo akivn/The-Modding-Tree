@@ -310,7 +310,7 @@ addLayer("g", {
         player.br.buff = new Decimal(0)
     },
     automate(){
-        if (player.g.buyableAuto && hasMilestone("h", 3) && !player.crunch.crunched) {
+        if (player.g.buyableAuto && hasMilestone("h", 3)) {
             for(i=1;i<101;i++){
                 buyBuyable("g", "limitup")
                 buyBuyable("g", "effectup")
